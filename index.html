@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMT Tarragona - Intranet</title>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo img {
+            max-width: 150px;
+            height: auto;
+        }
+        
+        h1 {
+            color: #1e3a8a;
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #6b7280;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #1e40af;
+        }
+        
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .error {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <!-- Logo EMT - puedes cambiarlo por la imagen real -->
+            <div style="background: #1e3a8a; color: white; padding: 20px; border-radius: 8px; font-weight: bold; font-size: 24px;">
+                EMT<br>Tarragona
+            </div>
+        </div>
+        
+        <h1>Intranet de Personal</h1>
+        <p class="subtitle">Gestión de permisos, vacaciones y servicios</p>
+        
+        <div id="errorMsg" class="error"></div>
+        
+        <div id="loginForm">
+            <div class="form-group">
+                <label for="email">Correu electrònic</label>
+                <input type="email" id="email" placeholder="nom@emttarragona.cat" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contrasenya</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            
+            <button onclick="login()" id="btnLogin">Accedir</button>
+        </div>
+        
+        <div id="loading" class="loading hidden">
+            Carregant...
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN FIREBASE - CAMBIA ESTO CON TUS DATOS
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROYECTO.firebaseapp.com",
+            projectId: "TU_PROYECTO",
+            storageBucket: "TU_PROYECTO.appspot.com",
+            messagingSenderId: "TU_MESSAGING_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // Mostrar error
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMsg');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Login
+        async function login() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btnLogin = document.getElementById('btnLogin');
+            
+            if (!email || !password) {
+                showError('Si us plau, introdueix email i contrasenya');
+                return;
+            }
+            
+            btnLogin.disabled = true;
+            btnLogin.textContent = 'Accedint...';
+            
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Verificar que el usuario existe en Firestore y tiene rol
+                const userDoc = await db.collection('usuarios').doc(user.uid).get();
+                
+                if (!userDoc.exists) {
+                    await auth.signOut();
+                    showError('Usuari no trobat a la base de dades. Contacta amb administració.');
+                    return;
+                }
+                
+                const userData = userDoc.data();
+                
+                // Guardar datos del usuario en sessionStorage
+                sessionStorage.setItem('userUID', user.uid);
+                sessionStorage.setItem('userName', userData.nombre);
+                sessionStorage.setItem('userRol', userData.rol);
+                sessionStorage.setItem('userNumeroPersonal', userData.numeroPersonal);
+                
+                // Redirigir al dashboard
+                window.location.href = 'dashboard.html';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                let mensaje = 'Error d\'autenticació';
+                
+                switch(error.code) {
+                    case 'auth/user-not-found':
+                        mensaje = 'Usuari no trobat';
+                        break;
+                    case 'auth/wrong-password':
+                        mensaje = 'Contrasenya incorrecta';
+                        break;
+                    case 'auth/invalid-email':
+                        mensaje = 'Email invàlid';
+                        break;
+                    case 'auth/too-many-requests':
+                        mensaje = 'Massa intents. Torna-ho a provar més tard';
+                        break;
+                }
+                
+                showError(mensaje);
+                btnLogin.disabled = false;
+                btnLogin.textContent = 'Accedir';
+            }
+        }
+        
+        // Permitir login con Enter
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+        
+        // Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+    </script>
+</body>
+</html>
