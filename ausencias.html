@@ -362,17 +362,18 @@
                     <label for="tipoAusencia" class="required">Tipus d'absència</label>
                     <select id="tipoAusencia" required>
                         <option value="">-- Selecciona una opció --</option>
-                        <option value="vacances">Vacances</option>
-                        <option value="permiso_matrimonio">Permís per matrimoni</option>
-                        <option value="permiso_mudanza">Permís per mudança</option>
-                        <option value="permiso_fallecimiento">Permís per defunció</option>
-                        <option value="permiso_enfermedad">Permís per malaltia greu familiar</option>
-                        <option value="permiso_examen">Permís per exàmen</option>
                         <option value="assumptes_propis">Assumptes propis</option>
-                        <option value="horas_contador">Hores de comptador</option>
-                        <option value="baja_medica">Baixa mèdica</option>
-                        <option value="permiso_sindical">Permís sindical</option>
                         <option value="altres">Altres</option>
+                        <option value="baja_medica">Baixa mèdica</option>
+                        <option value="defuncio_familiar">Defunció familiar</option>
+                        <option value="examen">Exàmens</option>
+                        <option value="horas_contador">Hores de comptador</option>
+                        <option value="malaltia_greu">Malaltia greu familiar</option>
+                        <option value="matrimoni">Matrimoni</option>
+                        <option value="matrimoni_fill">Matrimoni fill</option>
+                        <option value="mudanca">Mudança</option>
+                        <option value="permis_sindical">Permís sindical</option>
+                        <option value="vacances">Vacances</option>
                     </select>
                 </div>
 
@@ -465,7 +466,6 @@
             document.getElementById('fechaInicio').min = hoy;
             document.getElementById('fechaFin').min = hoy;
             
-            // Mostrar info de un solo día
             const singleDayInfo = document.getElementById('singleDayInfo');
             singleDayInfo.classList.add('show');
         });
@@ -484,7 +484,7 @@
                 document.getElementById('otroTipo').value = '';
             }
             
-            if (this.value === 'permiso_sindical') {
+            if (this.value === 'permis_sindical') {
                 horasGroup.style.display = 'block';
                 horarioBox.classList.add('active');
             } else {
@@ -511,17 +511,18 @@
                     tipoAusencia = 'altres';
                 } else {
                     const tiposMap = {
-                        'vacances': 'Vacances',
-                        'permiso_matrimonio': 'Permís matrimoni',
-                        'permiso_mudanza': 'Permís mudança',
-                        'permiso_fallecimiento': 'Permís defunció',
-                        'permiso_enfermedad': 'Permís malaltia greu familiar',
-                        'permiso_examen': 'Permís exàmen',
                         'assumptes_propis': 'Assumptes propis',
-                        'horas_contador': 'Hores comptador',
+                        'altres': 'Altres',
                         'baja_medica': 'Baixa mèdica',
-                        'permiso_sindical': 'Permís sindical',
-                        'altres': 'Altres'
+                        'defuncio_familiar': 'Defunció familiar',
+                        'examen': 'Exàmens',
+                        'horas_contador': 'Hores de comptador',
+                        'malaltia_greu': 'Malaltia greu familiar',
+                        'matrimoni': 'Matrimoni',
+                        'matrimoni_fill': 'Matrimoni fill',
+                        'mudanca': 'Mudança',
+                        'permis_sindical': 'Permís sindical',
+                        'vacances': 'Vacances'
                     };
                     tipoAusenciaTexto = tiposMap[tipoAusencia];
                 }
@@ -529,7 +530,6 @@
                 const fechaInicio = document.getElementById('fechaInicio').value;
                 let fechaFin = document.getElementById('fechaFin').value;
                 
-                // Si no se especifica fechaFin, usar la misma que fechaInicio
                 if (!fechaFin) {
                     fechaFin = fechaInicio;
                 }
