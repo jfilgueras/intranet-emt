@@ -1,1 +1,906 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMT Tarragona - Històric de sol·licituds</title>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-logo {
+            height: 45px;
+            width: auto;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+        
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            text-align: right;
+            font-size: 14px;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: white;
+        }
+        
+        .user-rol {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: capitalize;
+            color: white;
+        }
+        
+        .btn-logout {
+            background: white;
+            color: #dc2626;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-logout:hover {
+            background: #fee2e2;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .page-header {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid #dc2626;
+        }
+        
+        .page-header h1 {
+            color: #dc2626;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .page-header p {
+            color: #6b7280;
+        }
+        
+        /* FILTROS AVANZADOS */
+        .filters-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .filters-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #374151;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+        
+        .filters-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #b91c1c;
+        }
+        
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+        
+        /* ESTADÍSTICAS */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #dc2626;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        /* TABLA */
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            padding: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h3 {
+            color: #1f2937;
+        }
+        
+        .results-count {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #f9fafb;
+        }
+        
+        th {
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+            color: #1f2937;
+        }
+        
+        tr:hover {
+            background: #f9fafb;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        
+        .badge-pendiente {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-aprobada {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-rechazada {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .observaciones-cell {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .btn-ver {
+            background: #3b82f6;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .btn-ver:hover {
+            background: #2563eb;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+        
+        /* MODAL DETALLE */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            border-bottom: 2px solid #dc2626;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            color: #dc2626;
+            font-size: 20px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .modal-close:hover {
+            color: #dc2626;
+        }
+        
+        .detail-row {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 15px;
+            color: #1f2937;
+        }
+        
+        .observaciones-box {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #6b7280;
+            margin-top: 10px;
+        }
+        
+        .observaciones-box.aprobada {
+            background: #d1fae5;
+            border-left-color: #10b981;
+        }
+        
+        .observaciones-box.rechazada {
+            background: #fee2e2;
+            border-left-color: #ef4444;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="logo-emt.png" alt="EMT Tarragona" class="header-logo">
+            <div class="header-title">Intranet EMT de Tarragona</div>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <div class="user-name" id="userName">Carregant...</div>
+                <div class="user-rol" id="userRol"></div>
+            </div>
+            <button class="btn-logout" onclick="logout()">Sortir</button>
+        </div>
+    </div>
 
+    <div class="container">
+        <div class="page-header">
+            <h1>📚 Històric de sol·licituds</h1>
+            <p>Consulta totes les sol·licituds amb filtres avançats per realitzar cerques ràpides.</p>
+        </div>
+
+        <!-- Filtros avanzados -->
+        <div class="filters-card">
+            <div class="filters-title">🔍 Filtres de cerca</div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Estat</label>
+                    <select id="filterEstado">
+                        <option value="todos">Tots els estats</option>
+                        <option value="pendiente">Pendents</option>
+                        <option value="aprobada">Aprovades</option>
+                        <option value="rechazada">Rebutjades</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Tipus d'absència</label>
+                    <select id="filterTipo">
+                        <option value="todos">Tots els tipus</option>
+                        <option value="vacaciones">Vacances</option>
+                        <option value="permiso_matrimonio">Matrimoni</option>
+                        <option value="permiso_mudanza">Mudança</option>
+                        <option value="permiso_fallecimiento">Defunció</option>
+                        <option value="permiso_enfermedad">Malaltia greu</option>
+                        <option value="permiso_examen">Exàmen</option>
+                        <option value="asuntos_propios">Assumptes propis</option>
+                        <option value="horas_contador">Hores comptador</option>
+                        <option value="baja_medica">Baixa mèdica</option>
+                        <option value="otro">Altre</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Nº Personal</label>
+                    <input type="text" id="filterNumero" placeholder="Ex: 126">
+                </div>
+                <div class="filter-group">
+                    <label>Nom del conductor</label>
+                    <input type="text" id="filterNombre" placeholder="Cerca per nom...">
+                </div>
+                <div class="filter-group">
+                    <label>Data des de</label>
+                    <input type="date" id="filterFechaDesde">
+                </div>
+                <div class="filter-group">
+                    <label>Data fins</label>
+                    <input type="date" id="filterFechaHasta">
+                </div>
+                <div class="filter-group">
+                    <label>Responsable que va respondre</label>
+                    <input type="text" id="filterResponsable" placeholder="Nom del responsable...">
+                </div>
+            </div>
+            <div class="filters-actions">
+                <button class="btn btn-secondary" onclick="limpiarFiltros()">🗑️ Netejar filtres</button>
+                <button class="btn btn-primary" onclick="aplicarFiltros()">🔍 Cercar</button>
+            </div>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="countTotal">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="countPendiente">0</div>
+                <div class="stat-label">Pendents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="countAprobada">0</div>
+                <div class="stat-label">Aprovades</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="countRechazada">0</div>
+                <div class="stat-label">Rebutjades</div>
+            </div>
+        </div>
+
+        <!-- Tabla de resultados -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3>📋 Resultats de la cerca</h3>
+                <div class="results-count" id="resultsCount">0 sol·licituds</div>
+            </div>
+            <div class="table-container">
+                <table id="tablaSolicitudes">
+                    <thead>
+                        <tr>
+                            <th>Data sol·licitud</th>
+                            <th>Nº Personal</th>
+                            <th>Nom</th>
+                            <th>Tipus</th>
+                            <th>Període</th>
+                            <th>Estat</th>
+                            <th>Responsable</th>
+                            <th>Accions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodySolicitudes">
+                        <tr>
+                            <td colspan="8" class="loading">Carregant dades...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de detalle -->
+    <div class="modal-overlay" id="modalDetalle">
+        <div class="modal">
+            <div class="modal-header">
+                <h3> Detall de la sol·licitud</h3>
+                <button class="modal-close" onclick="cerrarModal()">✕</button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgydw6LkHb0QkIR3aZDSmcsGFDfDFX4rM",
+            authDomain: "emt-intranet.firebaseapp.com",
+            projectId: "emt-intranet",
+            storageBucket: "emt-intranet.firebasestorage.app",
+            messagingSenderId: "791189451295",
+            appId: "1:791189451295:web:a2b681f36d0a65b831b2a"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        let currentUserData = null;
+        let allSolicitudes = [];
+        let solicitudesFiltradas = [];
+        
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            const userDoc = await db.collection('usuarios').doc(user.uid).get();
+            
+            if (!userDoc.exists) {
+                alert('Usuari no trobat.');
+                await auth.signOut();
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            currentUserData = userDoc.data();
+            
+            // Verificar que es responsable
+            const rol = currentUserData.rol;
+            if (rol !== 'responsable_trafico' && rol !== 'responsable_planificacion' && rol !== 'admin') {
+                alert('No tens permís per accedir a aquesta pàgina.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            document.getElementById('userName').textContent = currentUserData.nombre;
+            document.getElementById('userRol').textContent = rol;
+            
+            await cargarSolicitudes();
+        });
+        
+        async function cargarSolicitudes() {
+            try {
+                const snapshot = await db.collection('solicitudes')
+                    .orderBy('fechaSolicitud', 'desc')
+                    .get();
+                
+                allSolicitudes = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                aplicarFiltros();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('tbodySolicitudes').innerHTML = `
+                    <tr><td colspan="8" class="empty-state">Error al carregar les dades</td></tr>
+                `;
+            }
+        }
+        
+        function aplicarFiltros() {
+            const estado = document.getElementById('filterEstado').value;
+            const tipo = document.getElementById('filterTipo').value;
+            const numero = document.getElementById('filterNumero').value.toLowerCase().trim();
+            const nombre = document.getElementById('filterNombre').value.toLowerCase().trim();
+            const fechaDesde = document.getElementById('filterFechaDesde').value;
+            const fechaHasta = document.getElementById('filterFechaHasta').value;
+            const responsable = document.getElementById('filterResponsable').value.toLowerCase().trim();
+            
+            solicitudesFiltradas = allSolicitudes.filter(s => {
+                if (estado !== 'todos' && s.estado !== estado) return false;
+                if (tipo !== 'todos' && s.tipoAusencia !== tipo) return false;
+                if (numero && (!s.numeroPersonal || !s.numeroPersonal.toLowerCase().includes(numero))) return false;
+                if (nombre && (!s.nombre || !s.nombre.toLowerCase().includes(nombre))) return false;
+                if (responsable && (!s.responsableRespuesta || !s.responsableRespuesta.toLowerCase().includes(responsable))) return false;
+                
+                if (fechaDesde || fechaHasta) {
+                    const fechaSolicitud = s.fechaSolicitud?.toDate();
+                    if (!fechaSolicitud) return false;
+                    
+                    if (fechaDesde) {
+                        const desde = new Date(fechaDesde);
+                        if (fechaSolicitud < desde) return false;
+                    }
+                    if (fechaHasta) {
+                        const hasta = new Date(fechaHasta);
+                        hasta.setHours(23, 59, 59);
+                        if (fechaSolicitud > hasta) return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            actualizarEstadisticas();
+            mostrarTabla();
+        }
+        
+        function limpiarFiltros() {
+            document.getElementById('filterEstado').value = 'todos';
+            document.getElementById('filterTipo').value = 'todos';
+            document.getElementById('filterNumero').value = '';
+            document.getElementById('filterNombre').value = '';
+            document.getElementById('filterFechaDesde').value = '';
+            document.getElementById('filterFechaHasta').value = '';
+            document.getElementById('filterResponsable').value = '';
+            aplicarFiltros();
+        }
+        
+        function actualizarEstadisticas() {
+            const total = solicitudesFiltradas.length;
+            const pendientes = solicitudesFiltradas.filter(s => s.estado === 'pendiente').length;
+            const aprobadas = solicitudesFiltradas.filter(s => s.estado === 'aprobada').length;
+            const rechazadas = solicitudesFiltradas.filter(s => s.estado === 'rechazada').length;
+            
+            document.getElementById('countTotal').textContent = total;
+            document.getElementById('countPendiente').textContent = pendientes;
+            document.getElementById('countAprobada').textContent = aprobadas;
+            document.getElementById('countRechazada').textContent = rechazadas;
+            document.getElementById('resultsCount').textContent = `${total} sol·licituds`;
+        }
+        
+        function mostrarTabla() {
+            const tbody = document.getElementById('tbodySolicitudes');
+            
+            if (solicitudesFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No s\'han trobat sol·licituds amb aquests filtres</td></tr>';
+                return;
+            }
+            
+            const tiposAusencia = {
+                'vacaciones': 'Vacances',
+                'permiso_matrimonio': 'Matrimoni',
+                'permiso_mudanza': 'Mudança',
+                'permiso_fallecimiento': 'Defunció',
+                'permiso_enfermedad': 'Malaltia greu',
+                'permiso_examen': 'Exàmen',
+                'asuntos_propios': 'Assumptes propis',
+                'horas_contador': 'Hores comptador',
+                'baja_medica': 'Baixa mèdica',
+                'otro': 'Altre'
+            };
+            
+            const estadoText = {
+                'pendiente': 'Pendent',
+                'aprobada': 'Aprovada',
+                'rechazada': 'Rebutjada'
+            };
+            
+            tbody.innerHTML = solicitudesFiltradas.map(s => {
+                const fechaSolicitud = s.fechaSolicitud?.toDate().toLocaleDateString('ca-ES') || 'N/A';
+                const fechaInicio = new Date(s.fechaInicio).toLocaleDateString('ca-ES');
+                const fechaFin = new Date(s.fechaFin).toLocaleDateString('ca-ES');
+                
+                return `
+                    <tr>
+                        <td>${fechaSolicitud}</td>
+                        <td>${s.numeroPersonal || 'N/A'}</td>
+                        <td>${s.nombre || 'N/A'}</td>
+                        <td>${tiposAusencia[s.tipoAusencia] || s.tipoAusencia}</td>
+                        <td>${fechaInicio} - ${fechaFin}</td>
+                        <td><span class="badge badge-${s.estado}">${estadoText[s.estado]}</span></td>
+                        <td>${s.responsableRespuesta || '-'}</td>
+                        <td><button class="btn-ver" onclick="verDetalle('${s.id}')">👁️ Veure</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function verDetalle(id) {
+            const solicitud = allSolicitudes.find(s => s.id === id);
+            if (!solicitud) return;
+            
+            const tiposAusencia = {
+                'vacaciones': 'Vacances',
+                'permiso_matrimonio': 'Permís matrimoni',
+                'permiso_mudanza': 'Permís mudança',
+                'permiso_fallecimiento': 'Permís defunció',
+                'permiso_enfermedad': 'Permís malaltia greu',
+                'permiso_examen': 'Permís exàmen',
+                'asuntos_propios': 'Assumptes propis',
+                'horas_contador': 'Hores comptador',
+                'baja_medica': 'Baixa mèdica',
+                'otro': 'Altre'
+            };
+            
+            const estadoText = {
+                'pendiente': 'Pendent',
+                'aprobada': 'Aprovada',
+                'rechazada': 'Rebutjada'
+            };
+            
+            const fechaSolicitud = solicitud.fechaSolicitud?.toDate().toLocaleString('ca-ES') || 'N/A';
+            const fechaInicio = new Date(solicitud.fechaInicio).toLocaleDateString('ca-ES');
+            const fechaFin = new Date(solicitud.fechaFin).toLocaleDateString('ca-ES');
+            const fechaRespuesta = solicitud.fechaRespuesta?.toDate().toLocaleString('ca-ES') || '-';
+            
+            let observacionesHTML = '';
+            if (solicitud.observaciones) {
+                const obsClass = solicitud.estado === 'aprobada' ? 'aprobada' : 
+                                solicitud.estado === 'rechazada' ? 'rechazada' : '';
+                observacionesHTML = `
+                    <div class="detail-row">
+                        <div class="detail-label">💬 Observacions del responsable</div>
+                        <div class="observaciones-box ${obsClass}">
+                            <p>${solicitud.observaciones}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('modalContent').innerHTML = `
+                <div class="detail-row">
+                    <div class="detail-label">Estat</div>
+                    <div class="detail-value"><span class="badge badge-${solicitud.estado}">${estadoText[solicitud.estado]}</span></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Conductor</div>
+                    <div class="detail-value"><strong>${solicitud.nombre}</strong> (Nº ${solicitud.numeroPersonal || 'N/A'})</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">${solicitud.email}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Tipus d'absència</div>
+                    <div class="detail-value">${tiposAusencia[solicitud.tipoAusencia] || solicitud.tipoAusencia}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Període sol·licitat</div>
+                    <div class="detail-value">${fechaInicio} - ${fechaFin}</div>
+                </div>
+                ${solicitud.horas ? `
+                <div class="detail-row">
+                    <div class="detail-label">Hores</div>
+                    <div class="detail-value">${solicitud.horas} hores</div>
+                </div>
+                ` : ''}
+                ${solicitud.motivo ? `
+                <div class="detail-row">
+                    <div class="detail-label">Motiu</div>
+                    <div class="detail-value">${solicitud.motivo}</div>
+                </div>
+                ` : ''}
+                ${observacionesHTML}
+                <div class="detail-row">
+                    <div class="detail-label">Data de la sol·licitud</div>
+                    <div class="detail-value">${fechaSolicitud}</div>
+                </div>
+                ${solicitud.responsableRespuesta ? `
+                <div class="detail-row">
+                    <div class="detail-label">Responsable que va respondre</div>
+                    <div class="detail-value">${solicitud.responsableRespuesta}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Data de resposta</div>
+                    <div class="detail-value">${fechaRespuesta}</div>
+                </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('modalDetalle').classList.add('active');
+        }
+        
+        function cerrarModal() {
+            document.getElementById('modalDetalle').classList.remove('active');
+        }
+        
+        async function logout() {
+            if (confirm('Segur que vols sortir de la sessió?')) {
+                await auth.signOut();
+                sessionStorage.clear();
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modalDetalle').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
+    </script>
+</body>
+</html>
