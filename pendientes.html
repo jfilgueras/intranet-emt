@@ -262,6 +262,36 @@
             color: #374151;
         }
         
+        .observaciones-box {
+            background: #f3f4f6;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 3px solid #6b7280;
+        }
+        
+        .observaciones-box.aprobada {
+            border-left-color: #10b981;
+            background: #d1fae5;
+        }
+        
+        .observaciones-box.rechazada {
+            border-left-color: #ef4444;
+            background: #fee2e2;
+        }
+        
+        .observaciones-box strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        .observaciones-box p {
+            margin: 0;
+            font-size: 14px;
+            color: #1f2937;
+        }
+        
         .solicitud-actions {
             display: flex;
             gap: 10px;
@@ -294,15 +324,6 @@
         
         .btn-reject:hover {
             background: #dc2626;
-        }
-        
-        .btn-view {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .btn-view:hover {
-            background: #2563eb;
         }
         
         .btn-secondary {
@@ -347,6 +368,103 @@
             color: #991b1b;
         }
         
+        /* MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            color: #1f2937;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .modal-header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-body label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+        
+        .modal-body textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .modal-body textarea:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .modal-footer .btn {
+            padding: 10px 20px;
+        }
+        
+        .btn-confirm-approve {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-confirm-approve:hover {
+            background: #059669;
+        }
+        
+        .btn-confirm-reject {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-confirm-reject:hover {
+            background: #dc2626;
+        }
+        
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -360,6 +478,14 @@
             
             .solicitud-actions {
                 flex-direction: column;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+            }
+            
+            .modal-footer .btn {
+                width: 100%;
             }
         }
     </style>
@@ -446,6 +572,24 @@
         </div>
     </div>
 
+    <!-- Modal de observaciones -->
+    <div class="modal-overlay" id="modalObservaciones">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Observacions</h3>
+                <p id="modalSubtitle">Afegeix comentaris per al conductor</p>
+            </div>
+            <div class="modal-body">
+                <label for="observaciones">Observacions (opcional)</label>
+                <textarea id="observaciones" placeholder="Ex: Has de presentar el justificant..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModal()">Cancel·lar</button>
+                <button class="btn" id="btnConfirmar" onclick="confirmarAccion()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
@@ -463,6 +607,8 @@
         
         let currentUserData = null;
         let allSolicitudes = [];
+        let solicitudActualId = null;
+        let accionActual = null; // 'aprobar' o 'rechazar'
         
         // Verificar sesión y permisos
         auth.onAuthStateChanged(async (user) => {
@@ -590,6 +736,19 @@
                 const fechaInicio = new Date(solicitud.fechaInicio).toLocaleDateString('ca-ES');
                 const fechaFin = new Date(solicitud.fechaFin).toLocaleDateString('ca-ES');
                 
+                // Mostrar observaciones si existen
+                let observacionesHTML = '';
+                if (solicitud.observaciones) {
+                    const obsClass = solicitud.estado === 'aprobada' ? 'aprobada' : 
+                                    solicitud.estado === 'rechazada' ? 'rechazada' : '';
+                    observacionesHTML = `
+                        <div class="observaciones-box ${obsClass}">
+                            <strong>💬 Observacions del responsable:</strong>
+                            <p>${solicitud.observaciones}</p>
+                        </div>
+                    `;
+                }
+                
                 return `
                     <div class="solicitud-item" data-id="${solicitud.id}">
                         <div class="solicitud-header">
@@ -609,14 +768,15 @@
                             <p><strong>Període:</strong> ${fechaInicio} - ${fechaFin}</p>
                             ${solicitud.horas ? `<p><strong>Hores:</strong> ${solicitud.horas}</p>` : ''}
                             ${solicitud.motivo ? `<p><strong>Motiu:</strong> ${solicitud.motivo}</p>` : ''}
+                            ${observacionesHTML}
                         </div>
                         
                         ${solicitud.estado === 'pendiente' ? `
                             <div class="solicitud-actions">
-                                <button class="btn btn-approve" onclick="aprobarSolicitud('${solicitud.id}')">
+                                <button class="btn btn-approve" onclick="abrirModal('${solicitud.id}', 'aprobar')">
                                     ✅ Aprovar
                                 </button>
-                                <button class="btn btn-reject" onclick="rechazarSolicitud('${solicitud.id}')">
+                                <button class="btn btn-reject" onclick="abrirModal('${solicitud.id}', 'rechazar')">
                                     ❌ Rebutjar
                                 </button>
                             </div>
@@ -636,45 +796,73 @@
             document.getElementById('countRechazada').textContent = rechazadas;
         }
         
-        async function aprobarSolicitud(id) {
-            if (!confirm('Estàs segur que vols APROVAR aquesta sol·licitud?')) {
-                return;
+        // Abrir modal de observaciones
+        function abrirModal(id, accion) {
+            solicitudActualId = id;
+            accionActual = accion;
+            
+            const modal = document.getElementById('modalObservaciones');
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            const btnConfirmar = document.getElementById('btnConfirmar');
+            const observaciones = document.getElementById('observaciones');
+            
+            // Limpiar textarea
+            observaciones.value = '';
+            
+            if (accion === 'aprobar') {
+                title.textContent = '✅ Aprovar sol·licitud';
+                subtitle.textContent = 'Afegeix observacions (opcional)';
+                btnConfirmar.textContent = 'Aprovar';
+                btnConfirmar.className = 'btn btn-confirm-approve';
+            } else {
+                title.textContent = '❌ Rebutjar sol·licitud';
+                subtitle.textContent = 'Indica el motiu del rebuig (opcional)';
+                btnConfirmar.textContent = 'Rebutjar';
+                btnConfirmar.className = 'btn btn-confirm-reject';
             }
             
-            try {
-                await db.collection('solicitudes').doc(id).update({
-                    estado: 'aprobada',
-                    fechaRespuesta: firebase.firestore.FieldValue.serverTimestamp(),
-                    responsableRespuesta: currentUserData.nombre
-                });
-                
-                showAlert('success', 'Sol·licitud aprovada correctament');
-                await cargarSolicitudes();
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showAlert('error', 'Error al aprovar la sol·licitud');
-            }
+            modal.classList.add('active');
         }
         
-        async function rechazarSolicitud(id) {
-            if (!confirm('Estàs segur que vols REBUTJAR aquesta sol·licitud?')) {
-                return;
-            }
+        // Cerrar modal
+        function cerrarModal() {
+            const modal = document.getElementById('modalObservaciones');
+            modal.classList.remove('active');
+            solicitudActualId = null;
+            accionActual = null;
+        }
+        
+        // Confirmar acción
+        async function confirmarAccion() {
+            const observaciones = document.getElementById('observaciones').value.trim();
             
             try {
-                await db.collection('solicitudes').doc(id).update({
-                    estado: 'rechazada',
+                const updateData = {
+                    estado: accionActual === 'aprobar' ? 'aprobada' : 'rechazada',
                     fechaRespuesta: firebase.firestore.FieldValue.serverTimestamp(),
                     responsableRespuesta: currentUserData.nombre
-                });
+                };
                 
-                showAlert('success', 'Sol·licitud rebutjada');
+                // Añadir observaciones si las hay
+                if (observaciones) {
+                    updateData.observaciones = observaciones;
+                }
+                
+                await db.collection('solicitudes').doc(solicitudActualId).update(updateData);
+                
+                const mensaje = accionActual === 'aprobar' ? 
+                    'Sol·licitud aprovada correctament' : 
+                    'Sol·licitud rebutjada';
+                
+                showAlert('success', mensaje);
+                cerrarModal();
                 await cargarSolicitudes();
                 
             } catch (error) {
                 console.error('Error:', error);
-                showAlert('error', 'Error al rebutjar la sol·licitud');
+                showAlert('error', 'Error al processar la sol·licitud');
+                cerrarModal();
             }
         }
         
@@ -698,6 +886,13 @@
                 window.location.href = 'index.html';
             }
         }
+        
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modalObservaciones').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarModal();
+            }
+        });
     </script>
 </body>
 </html>
