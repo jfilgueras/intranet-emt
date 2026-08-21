@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMT Tarragona - Intranet</title>
     
-    <!-- Firebase v9 (formato compat, igual que Manos de Luz) -->
+    <!-- Firebase v9 (formato compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1e3a8a">
+    <meta name="theme-color" content="#dc2626">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
@@ -25,7 +25,7 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -48,12 +48,12 @@
         }
         
         .logo img {
-            max-width: 150px;
+            max-width: 180px;
             height: auto;
         }
         
         h1 {
-            color: #1e3a8a;
+            color: #dc2626;
             font-size: 24px;
             margin-bottom: 10px;
             text-align: center;
@@ -89,13 +89,13 @@
         
         input:focus {
             outline: none;
-            border-color: #3b82f6;
+            border-color: #dc2626;
         }
         
         button {
             width: 100%;
             padding: 14px;
-            background: #1e3a8a;
+            background: #dc2626;
             color: white;
             border: none;
             border-radius: 8px;
@@ -107,7 +107,7 @@
         }
         
         button:hover {
-            background: #1e40af;
+            background: #b91c1c;
         }
         
         button:disabled {
@@ -177,9 +177,7 @@
 <body>
     <div class="container">
         <div class="logo">
-            <div style="background: #1e3a8a; color: white; padding: 20px; border-radius: 8px; font-weight: bold; font-size: 24px;">
-                EMT<br>Tarragona
-            </div>
+            <img src="logo-emt.png" alt="EMT Tarragona">
         </div>
         
         <h1>Intranet de Personal</h1>
@@ -262,7 +260,6 @@
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // Verificar que el usuario existe en Firestore
                 const userDoc = await db.collection('usuarios').doc(user.uid).get();
                 
                 if (!userDoc.exists) {
@@ -273,13 +270,11 @@
                 
                 const userData = userDoc.data();
                 
-                // Guardar datos del usuario en sessionStorage
                 sessionStorage.setItem('userUID', user.uid);
                 sessionStorage.setItem('userName', userData.nombre);
                 sessionStorage.setItem('userRol', userData.rol);
                 sessionStorage.setItem('userEmail', userData.email);
                 
-                // Redirigir al dashboard
                 window.location.href = 'dashboard.html';
                 
             } catch (error) {
@@ -315,11 +310,9 @@
                 const result = await auth.signInWithPopup(provider);
                 const user = result.user;
                 
-                // Verificar si el usuario existe en Firestore
                 const userDoc = await db.collection('usuarios').doc(user.uid).get();
                 
                 if (!userDoc.exists) {
-                    // Si no existe, crearlo con rol "conductor" por defecto
                     await db.collection('usuarios').doc(user.uid).set({
                         nombre: user.displayName,
                         email: user.email,
@@ -329,24 +322,20 @@
                         fechaCreacion: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     
-                    // Guardar datos en sessionStorage
                     sessionStorage.setItem('userUID', user.uid);
                     sessionStorage.setItem('userName', user.displayName);
                     sessionStorage.setItem('userRol', 'conductor');
                     sessionStorage.setItem('userEmail', user.email);
                     
-                    // Redirigir al dashboard
                     window.location.href = 'dashboard.html';
                 } else {
                     const userData = userDoc.data();
                     
-                    // Guardar datos del usuario en sessionStorage
                     sessionStorage.setItem('userUID', user.uid);
                     sessionStorage.setItem('userName', userData.nombre);
                     sessionStorage.setItem('userRol', userData.rol);
                     sessionStorage.setItem('userEmail', userData.email);
                     
-                    // Redirigir al dashboard
                     window.location.href = 'dashboard.html';
                 }
                 
@@ -356,17 +345,14 @@
             }
         }
         
-        // Permitir login con Enter
         document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 login();
             }
         });
         
-        // Verificar si ya hay sesión activa
         auth.onAuthStateChanged(async (user) => {
             if (user) {
-                // Usuario ya logueado, verificar en Firestore
                 const userDoc = await db.collection('usuarios').doc(user.uid).get();
                 
                 if (userDoc.exists) {
@@ -380,7 +366,6 @@
             }
         });
         
-        // Service Worker para PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js');
         }
