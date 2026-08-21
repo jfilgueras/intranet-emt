@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EMT Tarragona - Intranet</title>
     
-    <!-- Firebase -->
+    <!-- Firebase v9 (formato compat, igual que Manos de Luz) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -103,6 +103,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: background 0.3s;
+            margin-bottom: 10px;
         }
         
         button:hover {
@@ -112,6 +113,44 @@
         button:disabled {
             background: #9ca3af;
             cursor: not-allowed;
+        }
+        
+        .btn-google {
+            background: #4285f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-google:hover {
+            background: #357ae8;
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #6b7280;
+            font-size: 14px;
+            position: relative;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: #e5e7eb;
+        }
+        
+        .divider::before {
+            left: 0;
+        }
+        
+        .divider::after {
+            right: 0;
         }
         
         .error {
@@ -138,7 +177,6 @@
 <body>
     <div class="container">
         <div class="logo">
-            <!-- Logo EMT - puedes cambiarlo por la imagen real -->
             <div style="background: #1e3a8a; color: white; padding: 20px; border-radius: 8px; font-weight: bold; font-size: 24px;">
                 EMT<br>Tarragona
             </div>
@@ -161,6 +199,18 @@
             </div>
             
             <button onclick="login()" id="btnLogin">Accedir</button>
+            
+            <div class="divider">o</div>
+            
+            <button onclick="loginGoogle()" class="btn-google">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Accedir amb Google
+            </button>
         </div>
         
         <div id="loading" class="loading hidden">
@@ -169,14 +219,14 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN FIREBASE - CAMBIA ESTO CON TUS DATOS
+        // CONFIGURACIÓN FIREBASE - EMT INTRANET
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_PROYECTO.firebaseapp.com",
-            projectId: "TU_PROYECTO",
-            storageBucket: "TU_PROYECTO.appspot.com",
-            messagingSenderId: "TU_MESSAGING_SENDER_ID",
-            appId: "TU_APP_ID"
+            apiKey: "AIzaSyAgydw6LkHb0QkIR3aZDSmcsGFDfDFX4rM",
+            authDomain: "emt-intranet.firebaseapp.com",
+            projectId: "emt-intranet",
+            storageBucket: "emt-intranet.firebasestorage.app",
+            messagingSenderId: "791189451295",
+            appId: "1:791189451295:web:a2b681f36d0a65b831b2a"
         };
         
         // Inicializar Firebase
@@ -194,7 +244,7 @@
             }, 5000);
         }
         
-        // Login
+        // Login con Email/Password
         async function login() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
@@ -212,7 +262,7 @@
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // Verificar que el usuario existe en Firestore y tiene rol
+                // Verificar que el usuario existe en Firestore
                 const userDoc = await db.collection('usuarios').doc(user.uid).get();
                 
                 if (!userDoc.exists) {
@@ -227,7 +277,7 @@
                 sessionStorage.setItem('userUID', user.uid);
                 sessionStorage.setItem('userName', userData.nombre);
                 sessionStorage.setItem('userRol', userData.rol);
-                sessionStorage.setItem('userNumeroPersonal', userData.numeroPersonal);
+                sessionStorage.setItem('userEmail', userData.email);
                 
                 // Redirigir al dashboard
                 window.location.href = 'dashboard.html';
@@ -257,10 +307,76 @@
             }
         }
         
+        // Login con Google
+        async function loginGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                // Verificar si el usuario existe en Firestore
+                const userDoc = await db.collection('usuarios').doc(user.uid).get();
+                
+                if (!userDoc.exists) {
+                    // Si no existe, crearlo con rol "conductor" por defecto
+                    await db.collection('usuarios').doc(user.uid).set({
+                        nombre: user.displayName,
+                        email: user.email,
+                        rol: 'conductor',
+                        numeroPersonal: '',
+                        activo: true,
+                        fechaCreacion: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    // Guardar datos en sessionStorage
+                    sessionStorage.setItem('userUID', user.uid);
+                    sessionStorage.setItem('userName', user.displayName);
+                    sessionStorage.setItem('userRol', 'conductor');
+                    sessionStorage.setItem('userEmail', user.email);
+                    
+                    // Redirigir al dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    const userData = userDoc.data();
+                    
+                    // Guardar datos del usuario en sessionStorage
+                    sessionStorage.setItem('userUID', user.uid);
+                    sessionStorage.setItem('userName', userData.nombre);
+                    sessionStorage.setItem('userRol', userData.rol);
+                    sessionStorage.setItem('userEmail', userData.email);
+                    
+                    // Redirigir al dashboard
+                    window.location.href = 'dashboard.html';
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Error d\'autenticació amb Google');
+            }
+        }
+        
         // Permitir login con Enter
         document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 login();
+            }
+        });
+        
+        // Verificar si ya hay sesión activa
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                // Usuario ya logueado, verificar en Firestore
+                const userDoc = await db.collection('usuarios').doc(user.uid).get();
+                
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    sessionStorage.setItem('userUID', user.uid);
+                    sessionStorage.setItem('userName', userData.nombre);
+                    sessionStorage.setItem('userRol', userData.rol);
+                    sessionStorage.setItem('userEmail', userData.email);
+                    window.location.href = 'dashboard.html';
+                }
             }
         });
         
