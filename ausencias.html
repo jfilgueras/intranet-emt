@@ -23,7 +23,6 @@
             min-height: 100vh;
         }
         
-        /* CABECERA */
         .header {
             background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
             color: white;
@@ -95,9 +94,8 @@
             background: #fee2e2;
         }
         
-        /* CONTENIDO */
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 30px auto;
             padding: 0 20px;
         }
@@ -245,6 +243,44 @@
             color: #92400e;
         }
         
+        .horario-box {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .horario-box.active {
+            display: block;
+        }
+        
+        .horario-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .horario-row span {
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .horario-row input[type="time"] {
+            width: auto;
+            padding: 8px;
+            font-size: 14px;
+        }
+        
+        .horario-info {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -258,11 +294,15 @@
             .btn-group {
                 flex-direction: column;
             }
+            
+            .horario-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Cabecera -->
     <div class="header">
         <div class="header-left">
             <img src="logo-emt.png" alt="EMT Tarragona" class="header-logo">
@@ -277,7 +317,6 @@
         </div>
     </div>
 
-    <!-- Contenido -->
     <div class="container">
         <div class="form-card">
             <div class="form-header">
@@ -293,7 +332,6 @@
             </div>
 
             <form id="formAusencia">
-                <!-- Datos del usuario (autocompletados) -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>Nº Personal</label>
@@ -305,25 +343,29 @@
                     </div>
                 </div>
 
-                <!-- Tipo de ausencia -->
                 <div class="form-group">
                     <label for="tipoAusencia" class="required">Tipus d'absència</label>
                     <select id="tipoAusencia" required>
                         <option value="">-- Selecciona una opció --</option>
-                        <option value="vacaciones">Vacances</option>
+                        <option value="vacances">Vacances</option>
                         <option value="permiso_matrimonio">Permís per matrimoni</option>
                         <option value="permiso_mudanza">Permís per mudança</option>
                         <option value="permiso_fallecimiento">Permís per defunció</option>
                         <option value="permiso_enfermedad">Permís per malaltia greu familiar</option>
                         <option value="permiso_examen">Permís per exàmen</option>
-                        <option value="asuntos_propios">Assumptes propis</option>
+                        <option value="assumptes_propis">Assumptes propis</option>
                         <option value="horas_contador">Hores de comptador</option>
                         <option value="baja_medica">Baixa mèdica</option>
-                        <option value="otro">Altre</option>
+                        <option value="permiso_sindical">Permís sindical</option>
+                        <option value="altres">Altres</option>
                     </select>
                 </div>
 
-                <!-- Fechas -->
+                <div class="form-group" id="otroTipoGroup" style="display: none;">
+                    <label for="otroTipo" class="required">Especifica el tipus</label>
+                    <input type="text" id="otroTipo" placeholder="Ex: Assumptes propis, trasllat domicili, assistència metge...">
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="fechaInicio" class="required">Data d'inici</label>
@@ -335,19 +377,26 @@
                     </div>
                 </div>
 
-                <!-- Horas (solo para horas de contador) -->
                 <div class="form-group" id="horasGroup" style="display: none;">
-                    <label for="horas">Nombre d'hores</label>
-                    <input type="number" id="horas" min="1" max="24" placeholder="Ex: 4">
+                    <label>Horari del permís sindical</label>
+                    <div class="horario-box" id="horarioBox">
+                        <div class="horario-row">
+                            <span>De:</span>
+                            <input type="time" id="horaInicio" required>
+                            <span>a:</span>
+                            <input type="time" id="horaFin" required>
+                        </div>
+                        <div class="horario-info">
+                            Indica l'horari concret del permís sindical
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Motivo -->
                 <div class="form-group">
                     <label for="motivo">Motiu / Observacions</label>
                     <textarea id="motivo" placeholder="Descriu breument el motiu de la sol·licitud..."></textarea>
                 </div>
 
-                <!-- Botones -->
                 <div class="btn-group">
                     <button type="button" class="btn-secondary" onclick="window.location.href='dashboard.html'">← Tornar al menú</button>
                     <button type="submit" class="btn-primary" id="btnEnviar">Enviar sol·licitud</button>
@@ -357,7 +406,6 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAgydw6LkHb0QkIR3aZDSmcsGFDfDFX4rM",
             authDomain: "emt-intranet.firebaseapp.com",
@@ -373,7 +421,6 @@
         
         let currentUserData = null;
         
-        // Verificar sesión y cargar datos
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -391,36 +438,47 @@
             
             currentUserData = userDoc.data();
             
-            // Rellenar datos del usuario
             document.getElementById('userName').textContent = currentUserData.nombre;
             document.getElementById('userRol').textContent = currentUserData.rol;
             document.getElementById('numeroPersonal').value = currentUserData.numeroPersonal || '';
             document.getElementById('nombreCompleto').value = currentUserData.nombre;
             
-            // Establecer fecha mínima (hoy)
             const hoy = new Date().toISOString().split('T')[0];
             document.getElementById('fechaInicio').min = hoy;
             document.getElementById('fechaFin').min = hoy;
         });
         
-        // Mostrar campo de horas solo si es "horas de contador"
         document.getElementById('tipoAusencia').addEventListener('change', function() {
+            const otroTipoGroup = document.getElementById('otroTipoGroup');
             const horasGroup = document.getElementById('horasGroup');
-            if (this.value === 'horas_contador') {
+            const horarioBox = document.getElementById('horarioBox');
+            
+            // Mostrar campo "Especifica el tipo" solo si es "Altres"
+            if (this.value === 'altres') {
+                otroTipoGroup.style.display = 'block';
+                document.getElementById('otroTipo').required = true;
+            } else {
+                otroTipoGroup.style.display = 'none';
+                document.getElementById('otroTipo').required = false;
+                document.getElementById('otroTipo').value = '';
+            }
+            
+            // Mostrar campo de horas solo si es "Permís sindical"
+            if (this.value === 'permiso_sindical') {
                 horasGroup.style.display = 'block';
-                document.getElementById('horas').required = true;
+                horarioBox.classList.add('active');
             } else {
                 horasGroup.style.display = 'none';
-                document.getElementById('horas').required = false;
+                horarioBox.classList.remove('active');
+                document.getElementById('horaInicio').value = '';
+                document.getElementById('horaFin').value = '';
             }
         });
         
-        // Validar que fecha fin >= fecha inicio
         document.getElementById('fechaInicio').addEventListener('change', function() {
             document.getElementById('fechaFin').min = this.value;
         });
         
-        // Enviar formulario
         document.getElementById('formAusencia').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -429,15 +487,42 @@
             btnEnviar.textContent = 'Enviant...';
             
             try {
+                let tipoAusencia = document.getElementById('tipoAusencia').value;
+                let tipoAusenciaTexto = '';
+                
+                // Si es "Altres", usar el texto especificado
+                if (tipoAusencia === 'altres') {
+                    tipoAusenciaTexto = document.getElementById('otroTipo').value.trim();
+                    tipoAusencia = 'altres';
+                } else {
+                    // Mapear valores a texto
+                    const tiposMap = {
+                        'vacances': 'Vacances',
+                        'permiso_matrimonio': 'Permís matrimoni',
+                        'permiso_mudanza': 'Permís mudança',
+                        'permiso_fallecimiento': 'Permís defunció',
+                        'permiso_enfermedad': 'Permís malaltia greu familiar',
+                        'permiso_examen': 'Permís exàmen',
+                        'assumptes_propis': 'Assumptes propis',
+                        'horas_contador': 'Hores comptador',
+                        'baja_medica': 'Baixa mèdica',
+                        'permiso_sindical': 'Permís sindical',
+                        'altres': 'Altres'
+                    };
+                    tipoAusenciaTexto = tiposMap[tipoAusencia];
+                }
+                
                 const solicitud = {
                     userId: auth.currentUser.uid,
                     numeroPersonal: currentUserData.numeroPersonal,
                     nombre: currentUserData.nombre,
                     email: currentUserData.email,
-                    tipoAusencia: document.getElementById('tipoAusencia').value,
+                    tipoAusencia: tipoAusencia,
+                    tipoAusenciaTexto: tipoAusenciaTexto,
                     fechaInicio: document.getElementById('fechaInicio').value,
                     fechaFin: document.getElementById('fechaFin').value,
-                    horas: document.getElementById('horas').value || null,
+                    horaInicio: document.getElementById('horaInicio').value || null,
+                    horaFin: document.getElementById('horaFin').value || null,
                     motivo: document.getElementById('motivo').value,
                     estado: 'pendiente',
                     fechaSolicitud: firebase.firestore.FieldValue.serverTimestamp()
@@ -445,18 +530,16 @@
                 
                 await db.collection('solicitudes').add(solicitud);
                 
-                // Mostrar éxito
                 const alertSuccess = document.getElementById('alertSuccess');
                 alertSuccess.textContent = '✅ Sol·licitud enviada correctament. Rebràs una notificació quan sigui revisada.';
                 alertSuccess.style.display = 'block';
                 
-                // Resetear formulario
                 document.getElementById('formAusencia').reset();
                 document.getElementById('numeroPersonal').value = currentUserData.numeroPersonal || '';
                 document.getElementById('nombreCompleto').value = currentUserData.nombre;
+                document.getElementById('otroTipoGroup').style.display = 'none';
                 document.getElementById('horasGroup').style.display = 'none';
                 
-                // Ocultar alerta después de 5 segundos
                 setTimeout(() => {
                     alertSuccess.style.display = 'none';
                 }, 5000);
