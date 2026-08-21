@@ -465,7 +465,7 @@
 
                     <div class="form-group">
                         <label for="tipoAusencia" class="required">Tipus d'absència</label>
-                        <select id="tipoAusencia" required>
+                        <select id="tipoAusencia">
                             <option value="">-- Selecciona una opció --</option>
                             <option value="assumptes_propis">Assumptes propis</option>
                             <option value="altres">Altres</option>
@@ -490,7 +490,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="fechaInicio" class="required">Data d'inici</label>
-                            <input type="date" id="fechaInicio" required>
+                            <input type="date" id="fechaInicio">
                         </div>
                         <div class="form-group">
                             <label for="fechaFin">Data de fi (opcional)</label>
@@ -570,7 +570,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        console.log('🔥 Firebase inicializado');
+        console.log(' Firebase inicializado');
         
         let currentUserData = null;
         
@@ -578,7 +578,7 @@
             console.log('👤 Estado de auth:', user ? user.email : 'No autenticado');
             
             if (!user) {
-                console.log(' No hay usuario, redirigiendo al login');
+                console.log('🔒 No hay usuario, redirigiendo al login');
                 window.location.href = 'index.html';
                 return;
             }
@@ -719,7 +719,7 @@
                 };
                 
                 console.log('📝 Datos a enviar:', solicitud);
-                console.log(' Guardando en Firestore...');
+                console.log('💾 Guardando en Firestore...');
                 
                 const docRef = await db.collection('solicitudes').add(solicitud);
                 console.log('✅ Solicitud guardada con ID:', docRef.id);
@@ -749,7 +749,7 @@
                 document.getElementById('successMessage').classList.add('show');
                 
             } catch (error) {
-                console.error(' Error al enviar:', error);
+                console.error('❌ Error al enviar:', error);
                 document.getElementById('errorDetails').textContent = error.message;
                 document.getElementById('formContainer').style.display = 'none';
                 document.getElementById('errorMessage').classList.add('show');
