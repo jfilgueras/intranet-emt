@@ -214,25 +214,6 @@
             background: #d1d5db;
         }
         
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 1px solid #6ee7b7;
-        }
-        
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fca5a5;
-        }
-        
         .info-box {
             background: #fef3c7;
             border-left: 4px solid #f59e0b;
@@ -296,6 +277,129 @@
             font-style: italic;
         }
         
+        /* MENSAJE DE CONFIRMACIÓN */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: scaleIn 0.5s ease-out;
+        }
+        
+        @keyframes scaleIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .success-message h2 {
+            color: #065f46;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .success-message p {
+            color: #6b7280;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .success-details {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .success-details p {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #374151;
+        }
+        
+        .success-details strong {
+            color: #1f2937;
+        }
+        
+        .success-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-success-primary {
+            background: #dc2626;
+            color: white;
+            padding: 12px 30px;
+        }
+        
+        .btn-success-primary:hover {
+            background: #b91c1c;
+        }
+        
+        .btn-success-secondary {
+            background: #e5e7eb;
+            color: #374151;
+            padding: 12px 30px;
+        }
+        
+        .btn-success-secondary:hover {
+            background: #d1d5db;
+        }
+        
+        /* ERROR */
+        .error-message {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .error-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .error-message h2 {
+            color: #991b1b;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .error-message p {
+            color: #6b7280;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -313,6 +417,10 @@
             .horario-row {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+            
+            .success-actions {
+                flex-direction: column;
             }
         }
     </style>
@@ -334,93 +442,116 @@
 
     <div class="container">
         <div class="form-card">
-            <div class="form-header">
-                <h2>📋 Sol·licitud d'absència</h2>
-                <p>Completa el formulari per sol·licitar permisos, vacances o altres absències.</p>
+            <!-- FORMULARIO -->
+            <div id="formContainer">
+                <div class="form-header">
+                    <h2>📋 Sol·licitud d'absència</h2>
+                    <p>Completa el formulari per sol·licitar permisos, vacances o altres absències.</p>
+                </div>
+
+                <div class="info-box">
+                    <strong>ℹ️ Informació:</strong> La teva sol·licitud serà revisada pel responsable de trànsit. Rebràs una notificació quan sigui aprovada o rebutjada.
+                </div>
+
+                <form id="formAusencia">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nº Personal</label>
+                            <input type="text" id="numeroPersonal" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Nom complet</label>
+                            <input type="text" id="nombreCompleto" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipoAusencia" class="required">Tipus d'absència</label>
+                        <select id="tipoAusencia" required>
+                            <option value="">-- Selecciona una opció --</option>
+                            <option value="assumptes_propis">Assumptes propis</option>
+                            <option value="altres">Altres</option>
+                            <option value="baja_medica">Baixa mèdica</option>
+                            <option value="defuncio_familiar">Defunció familiar</option>
+                            <option value="examen">Exàmens</option>
+                            <option value="horas_contador">Hores de comptador</option>
+                            <option value="malaltia_greu">Malaltia greu familiar</option>
+                            <option value="matrimoni">Matrimoni</option>
+                            <option value="matrimoni_fill">Matrimoni fill</option>
+                            <option value="mudanca">Mudança</option>
+                            <option value="permis_sindical">Permís sindical</option>
+                            <option value="vacances">Vacances</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="otroTipoGroup" style="display: none;">
+                        <label for="otroTipo" class="required">Especifica el tipus</label>
+                        <input type="text" id="otroTipo" placeholder="Ex: Assumptes propis, trasllat domicili, assistència metge...">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fechaInicio" class="required">Data d'inici</label>
+                            <input type="date" id="fechaInicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fechaFin">Data de fi (opcional)</label>
+                            <input type="date" id="fechaFin">
+                            <div class="single-day-info" id="singleDayInfo">
+                                ✓ Si només és un dia, deixa aquest camp buit. S'aplicarà la mateixa data d'inici.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="horasGroup" style="display: none;">
+                        <label>Horari del permís sindical</label>
+                        <div class="horario-box" id="horarioBox">
+                            <div class="horario-row">
+                                <span>De:</span>
+                                <input type="time" id="horaInicio" required>
+                                <span>a:</span>
+                                <input type="time" id="horaFin" required>
+                            </div>
+                            <div class="horario-info">
+                                Indica l'horari concret del permís sindical
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="motivo">Motiu / Observacions</label>
+                        <textarea id="motivo" placeholder="Descriu breument el motiu de la sol·licitud..."></textarea>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="button" class="btn-secondary" onclick="window.location.href='dashboard.html'">← Tornar al menú</button>
+                        <button type="submit" class="btn-primary" id="btnEnviar">Enviar sol·licitud</button>
+                    </div>
+                </form>
             </div>
 
-            <div id="alertSuccess" class="alert alert-success"></div>
-            <div id="alertError" class="alert alert-error"></div>
-
-            <div class="info-box">
-                <strong>ℹ️ Informació:</strong> La teva sol·licitud serà revisada pel responsable de trànsit. Rebràs una notificació quan sigui aprovada o rebutjada.
+            <!-- MENSAJE DE ÉXITO -->
+            <div id="successMessage" class="success-message">
+                <div class="success-icon">✅</div>
+                <h2>Sol·licitud enviada correctament!</h2>
+                <p>La teva sol·licitud serà revisada pel responsable de trànsit. Rebràs una notificació quan sigui aprovada o rebutjada.</p>
+                <div class="success-details" id="successDetails"></div>
+                <div class="success-actions">
+                    <button class="btn-success-secondary" onclick="nuevaSolicitud()">📝 Nova sol·licitud</button>
+                    <button class="btn-success-primary" onclick="window.location.href='dashboard.html'">← Tornar al menú</button>
+                </div>
             </div>
 
-            <form id="formAusencia">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Nº Personal</label>
-                        <input type="text" id="numeroPersonal" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>Nom complet</label>
-                        <input type="text" id="nombreCompleto" readonly>
-                    </div>
+            <!-- MENSAJE DE ERROR -->
+            <div id="errorMessage" class="error-message">
+                <div class="error-icon">❌</div>
+                <h2>Error al enviar la sol·licitud</h2>
+                <p>Hi ha hagut un problema. Si us plau, torna-ho a provar.</p>
+                <div class="success-actions">
+                    <button class="btn-success-secondary" onclick="volverAlFormulario()">← Tornar al formulari</button>
+                    <button class="btn-success-primary" onclick="window.location.href='dashboard.html'">← Tornar al menú</button>
                 </div>
-
-                <div class="form-group">
-                    <label for="tipoAusencia" class="required">Tipus d'absència</label>
-                    <select id="tipoAusencia" required>
-                        <option value="">-- Selecciona una opció --</option>
-                        <option value="assumptes_propis">Assumptes propis</option>
-                        <option value="altres">Altres</option>
-                        <option value="baja_medica">Baixa mèdica</option>
-                        <option value="defuncio_familiar">Defunció familiar</option>
-                        <option value="examen">Exàmens</option>
-                        <option value="horas_contador">Hores de comptador</option>
-                        <option value="malaltia_greu">Malaltia greu familiar</option>
-                        <option value="matrimoni">Matrimoni</option>
-                        <option value="matrimoni_fill">Matrimoni fill</option>
-                        <option value="mudanca">Mudança</option>
-                        <option value="permis_sindical">Permís sindical</option>
-                        <option value="vacances">Vacances</option>
-                    </select>
-                </div>
-
-                <div class="form-group" id="otroTipoGroup" style="display: none;">
-                    <label for="otroTipo" class="required">Especifica el tipus</label>
-                    <input type="text" id="otroTipo" placeholder="Ex: Assumptes propis, trasllat domicili, assistència metge...">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="fechaInicio" class="required">Data d'inici</label>
-                        <input type="date" id="fechaInicio" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="fechaFin">Data de fi (opcional)</label>
-                        <input type="date" id="fechaFin">
-                        <div class="single-day-info" id="singleDayInfo">
-                            ✓ Si només és un dia, deixa aquest camp buit. S'aplicarà la mateixa data d'inici.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group" id="horasGroup" style="display: none;">
-                    <label>Horari del permís sindical</label>
-                    <div class="horario-box" id="horarioBox">
-                        <div class="horario-row">
-                            <span>De:</span>
-                            <input type="time" id="horaInicio" required>
-                            <span>a:</span>
-                            <input type="time" id="horaFin" required>
-                        </div>
-                        <div class="horario-info">
-                            Indica l'horari concret del permís sindical
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="motivo">Motiu / Observacions</label>
-                    <textarea id="motivo" placeholder="Descriu breument el motiu de la sol·licitud..."></textarea>
-                </div>
-
-                <div class="btn-group">
-                    <button type="button" class="btn-secondary" onclick="window.location.href='dashboard.html'">← Tornar al menú</button>
-                    <button type="submit" class="btn-primary" id="btnEnviar">Enviar sol·licitud</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -466,8 +597,7 @@
             document.getElementById('fechaInicio').min = hoy;
             document.getElementById('fechaFin').min = hoy;
             
-            const singleDayInfo = document.getElementById('singleDayInfo');
-            singleDayInfo.classList.add('show');
+            document.getElementById('singleDayInfo').classList.add('show');
         });
         
         document.getElementById('tipoAusencia').addEventListener('change', function() {
@@ -508,7 +638,6 @@
                 
                 if (tipoAusencia === 'altres') {
                     tipoAusenciaTexto = document.getElementById('otroTipo').value.trim();
-                    tipoAusencia = 'altres';
                 } else {
                     const tiposMap = {
                         'assumptes_propis': 'Assumptes propis',
@@ -552,34 +681,61 @@
                 
                 await db.collection('solicitudes').add(solicitud);
                 
-                const alertSuccess = document.getElementById('alertSuccess');
-                alertSuccess.textContent = '✅ Sol·licitud enviada correctament. Rebràs una notificació quan sigui revisada.';
-                alertSuccess.style.display = 'block';
+                // Mostrar resumen de la solicitud
+                const fechaInicioFormateada = new Date(fechaInicio).toLocaleDateString('ca-ES');
+                const fechaFinFormateada = new Date(fechaFin).toLocaleDateString('ca-ES');
                 
-                document.getElementById('formAusencia').reset();
-                document.getElementById('numeroPersonal').value = currentUserData.numeroPersonal || '';
-                document.getElementById('nombreCompleto').value = currentUserData.nombre;
-                document.getElementById('otroTipoGroup').style.display = 'none';
-                document.getElementById('horasGroup').style.display = 'none';
+                let resumenHTML = `
+                    <p><strong>Tipus:</strong> ${tipoAusenciaTexto}</p>
+                    <p><strong>Període:</strong> ${fechaInicioFormateada}`;
                 
-                setTimeout(() => {
-                    alertSuccess.style.display = 'none';
-                }, 5000);
+                if (fechaInicio !== fechaFin) {
+                    resumenHTML += ` - ${fechaFinFormateada}`;
+                }
+                
+                resumenHTML += `</p>`;
+                
+                if (document.getElementById('horaInicio').value) {
+                    resumenHTML += `<p><strong>Horari:</strong> ${document.getElementById('horaInicio').value} - ${document.getElementById('horaFin').value}</p>`;
+                }
+                
+                document.getElementById('successDetails').innerHTML = resumenHTML;
+                
+                // Ocultar formulario y mostrar mensaje de éxito
+                document.getElementById('formContainer').style.display = 'none';
+                document.getElementById('successMessage').classList.add('show');
                 
             } catch (error) {
                 console.error('Error:', error);
-                const alertError = document.getElementById('alertError');
-                alertError.textContent = '❌ Error al enviar la sol·licitud. Torna-ho a provar.';
-                alertError.style.display = 'block';
                 
-                setTimeout(() => {
-                    alertError.style.display = 'none';
-                }, 5000);
+                // Ocultar formulario y mostrar mensaje de error
+                document.getElementById('formContainer').style.display = 'none';
+                document.getElementById('errorMessage').classList.add('show');
             }
             
             btnEnviar.disabled = false;
             btnEnviar.textContent = 'Enviar sol·licitud';
         });
+        
+        function nuevaSolicitud() {
+            // Resetear formulario
+            document.getElementById('formAusencia').reset();
+            document.getElementById('numeroPersonal').value = currentUserData.numeroPersonal || '';
+            document.getElementById('nombreCompleto').value = currentUserData.nombre;
+            document.getElementById('otroTipoGroup').style.display = 'none';
+            document.getElementById('horasGroup').style.display = 'none';
+            document.getElementById('singleDayInfo').classList.add('show');
+            
+            // Ocultar mensajes y mostrar formulario
+            document.getElementById('successMessage').classList.remove('show');
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('formContainer').style.display = 'block';
+        }
+        
+        function volverAlFormulario() {
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('formContainer').style.display = 'block';
+        }
         
         async function logout() {
             if (confirm('Segur que vols sortir de la sessió?')) {
