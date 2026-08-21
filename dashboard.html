@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMT Tarragona - Dashboard</title>
+    <title>EMT Tarragona - Intranet</title>
     
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -32,6 +32,9 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         .header-left {
@@ -41,13 +44,17 @@
         }
         
         .header-logo {
-            height: 40px;
+            height: 45px;
             width: auto;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 8px;
         }
         
         .header-title {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
         }
         
         .header-right {
@@ -63,12 +70,14 @@
         
         .user-name {
             font-weight: 600;
+            color: white;
         }
         
         .user-rol {
             font-size: 12px;
             opacity: 0.9;
             text-transform: capitalize;
+            color: white;
         }
         
         .btn-logout {
@@ -80,10 +89,12 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 14px;
+            transition: all 0.3s;
         }
         
         .btn-logout:hover {
             background: #fee2e2;
+            transform: scale(1.05);
         }
         
         /* CONTENIDO PRINCIPAL */
@@ -171,43 +182,35 @@
                 flex-direction: column;
                 gap: 10px;
                 text-align: center;
+                padding: 15px;
+            }
+            
+            .header-left {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header-title {
+                font-size: 16px;
             }
             
             .header-right {
                 flex-direction: column;
                 gap: 10px;
+                width: 100%;
             }
             
             .user-info {
                 text-align: center;
             }
             
+            .btn-logout {
+                width: 100%;
+            }
+            
             .menu-grid {
                 grid-template-columns: 1fr;
             }
-        }
-        
-        /* LOGIN OBLIGATORIO */
-        .login-required {
-            text-align: center;
-            padding: 50px 20px;
-        }
-        
-        .login-required h2 {
-            color: #dc2626;
-            margin-bottom: 20px;
-        }
-        
-        .btn-login {
-            background: #dc2626;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
         }
     </style>
 </head>
@@ -215,8 +218,8 @@
     <!-- Cabecera -->
     <div class="header">
         <div class="header-left">
-            <img src="logo-emt.png" alt="EMT" class="header-logo">
-            <div class="header-title">Intranet de Personal</div>
+            <img src="logo-emt.png" alt="EMT Tarragona" class="header-logo">
+            <div class="header-title">Intranet EMT de Tarragona</div>
         </div>
         <div class="header-right">
             <div class="user-info">
@@ -257,12 +260,10 @@
         // Verificar sesión
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
-                // No hay sesión, redirigir al login
                 window.location.href = 'index.html';
                 return;
             }
             
-            // Cargar datos del usuario
             const userDoc = await db.collection('usuarios').doc(user.uid).get();
             
             if (!userDoc.exists) {
@@ -274,21 +275,17 @@
             
             const userData = userDoc.data();
             
-            // Mostrar información del usuario
             document.getElementById('userName').textContent = userData.nombre;
             document.getElementById('userRol').textContent = userData.rol;
             document.getElementById('welcomeText').textContent = `Benvingut/da, ${userData.nombre}!`;
             
-            // Generar menú según rol
             generarMenu(userData.rol);
         });
         
-        // Generar menú según el rol del usuario
         function generarMenu(rol) {
             const menuGrid = document.getElementById('menuGrid');
             menuGrid.innerHTML = '';
             
-            // Opciones comunes para todos los conductores
             const opcionesConductor = [
                 {
                     icon: '📋',
@@ -309,14 +306,13 @@
                     pagina: 'vacaciones.html'
                 },
                 {
-                    icon: '📰',
+                    icon: '',
                     titulo: 'Tauler de comunicats',
                     descripcion: 'Consulta les últimes notícies i comunicats.',
                     pagina: 'comunicados.html'
                 }
             ];
             
-            // Opciones adicionales para responsables
             const opcionesResponsable = [
                 {
                     icon: '✅',
@@ -335,12 +331,10 @@
             
             let opciones = [...opcionesConductor];
             
-            // Si es responsable o admin, añadir opciones extra
             if (rol === 'responsable_trafico' || rol === 'responsable_planificacion' || rol === 'admin') {
                 opciones = [...opciones, ...opcionesResponsable];
             }
             
-            // Crear las tarjetas del menú
             opciones.forEach(opcion => {
                 const card = document.createElement('a');
                 card.className = 'menu-card';
@@ -354,7 +348,6 @@
             });
         }
         
-        // Cerrar sesión
         async function logout() {
             if (confirm('Segur que vols sortir de la sessió?')) {
                 await auth.signOut();
