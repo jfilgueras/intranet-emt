@@ -23,7 +23,6 @@
             min-height: 100vh;
         }
         
-        /* CABECERA */
         .header {
             background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
             color: white;
@@ -89,15 +88,12 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.3s;
         }
         
         .btn-logout:hover {
             background: #fee2e2;
-            transform: scale(1.05);
         }
         
-        /* CONTENIDO PRINCIPAL */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -122,7 +118,16 @@
             color: #6b7280;
         }
         
-        /* GRID DE MENÚ */
+        .section-title {
+            color: #1f2937;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dc2626;
+        }
+        
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -176,7 +181,6 @@
             margin-left: 8px;
         }
         
-        /* RESPONSIVE */
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
@@ -215,7 +219,6 @@
     </style>
 </head>
 <body>
-    <!-- Cabecera -->
     <div class="header">
         <div class="header-left">
             <img src="logo-emt.png" alt="EMT Tarragona" class="header-logo">
@@ -230,20 +233,28 @@
         </div>
     </div>
 
-    <!-- Contenido -->
     <div class="container" id="mainContent">
         <div class="welcome">
             <h2 id="welcomeText">Benvingut/da!</h2>
             <p>Selecciona una opció del menú per començar.</p>
         </div>
 
-        <div class="menu-grid" id="menuGrid">
-            <!-- Las opciones se generan dinámicamente según el rol -->
+        <!-- Sección: Mis solicitudes (TODOS los usuarios) -->
+        <div class="section-title">📝 Les meves gestions</div>
+        <div class="menu-grid" id="menuPersonal">
+            <!-- Opciones para todos -->
+        </div>
+
+        <!-- Sección: Gestión (SOLO responsables) -->
+        <div id="seccionGestion" style="display: none;">
+            <div class="section-title">👨‍ Gestió d'equip</div>
+            <div class="menu-grid" id="menuGestion">
+                <!-- Opciones solo para responsables -->
+            </div>
         </div>
     </div>
 
     <script>
-        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAgydw6LkHb0QkIR3aZDSmcsGFDfDFX4rM",
             authDomain: "emt-intranet.firebaseapp.com",
@@ -257,7 +268,6 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // Verificar sesión
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -279,14 +289,8 @@
             document.getElementById('userRol').textContent = userData.rol;
             document.getElementById('welcomeText').textContent = `Benvingut/da, ${userData.nombre}!`;
             
-            generarMenu(userData.rol);
-        });
-        
-        function generarMenu(rol) {
-            const menuGrid = document.getElementById('menuGrid');
-            menuGrid.innerHTML = '';
-            
-            const opcionesConductor = [
+            // Opciones para TODOS los usuarios (conductores y responsables)
+            const opcionesPersonales = [
                 {
                     icon: '📋',
                     titulo: 'Sol·licitud d\'absència',
@@ -300,53 +304,69 @@
                     pagina: 'servicios.html'
                 },
                 {
-                    icon: '🏖️',
+                    icon: '️',
                     titulo: 'Canvi de vacances',
                     descripcion: 'Intercanvia les teves vacances amb un company.',
                     pagina: 'vacaciones.html'
                 },
                 {
-                    icon: '',
+                    icon: '📰',
                     titulo: 'Tauler de comunicats',
                     descripcion: 'Consulta les últimes notícies i comunicats.',
                     pagina: 'comunicados.html'
                 }
             ];
             
-            const opcionesResponsable = [
+            // Opciones SOLO para responsables
+            const opcionesGestion = [
                 {
                     icon: '✅',
                     titulo: 'Peticions pendents',
-                    descripcion: 'Revisa i autoritza les sol·licituds dels conductors.',
+                    descripcion: 'Revisa i autoritza les sol·licituds dels companys.',
                     pagina: 'pendientes.html',
                     badge: true
                 },
                 {
-                    icon: '📊',
-                    titulo: 'Gestió de personal',
-                    descripcion: 'Administra usuaris, rols i configuració.',
-                    pagina: 'gestion.html'
+                    icon: '📚',
+                    titulo: 'Històric de sol·licituds',
+                    descripcion: 'Consulta totes les sol·licituds amb filtres avançats.',
+                    pagina: 'historico.html'
                 }
             ];
             
-            let opciones = [...opcionesConductor];
-            
-            if (rol === 'responsable_trafico' || rol === 'responsable_planificacion' || rol === 'admin') {
-                opciones = [...opciones, ...opcionesResponsable];
-            }
-            
-            opciones.forEach(opcion => {
+            // Renderizar menú personal (todos)
+            const menuPersonal = document.getElementById('menuPersonal');
+            opcionesPersonales.forEach(opcion => {
                 const card = document.createElement('a');
                 card.className = 'menu-card';
                 card.href = opcion.pagina;
                 card.innerHTML = `
                     <div class="menu-card-icon">${opcion.icon}</div>
-                    <h3>${opcion.titulo}${opcion.badge ? '<span class="badge">Nou</span>' : ''}</h3>
+                    <h3>${opcion.titulo}</h3>
                     <p>${opcion.descripcion}</p>
                 `;
-                menuGrid.appendChild(card);
+                menuPersonal.appendChild(card);
             });
-        }
+            
+            // Si es responsable, mostrar sección de gestión
+            const rol = userData.rol;
+            if (rol === 'responsable_trafico' || rol === 'responsable_planificacion' || rol === 'admin') {
+                document.getElementById('seccionGestion').style.display = 'block';
+                
+                const menuGestion = document.getElementById('menuGestion');
+                opcionesGestion.forEach(opcion => {
+                    const card = document.createElement('a');
+                    card.className = 'menu-card';
+                    card.href = opcion.pagina;
+                    card.innerHTML = `
+                        <div class="menu-card-icon">${opcion.icon}</div>
+                        <h3>${opcion.titulo}${opcion.badge ? '<span class="badge">Nou</span>' : ''}</h3>
+                        <p>${opcion.descripcion}</p>
+                    `;
+                    menuGestion.appendChild(card);
+                });
+            }
+        });
         
         async function logout() {
             if (confirm('Segur que vols sortir de la sessió?')) {
