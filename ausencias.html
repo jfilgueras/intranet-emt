@@ -232,11 +232,6 @@
             margin-top: 10px;
             font-size: 13px;
             color: #1e40af;
-            display: none;
-        }
-        
-        .single-day-info.show {
-            display: block;
         }
         
         .horario-box {
@@ -295,17 +290,9 @@
         }
         
         @keyframes scaleIn {
-            0% {
-                transform: scale(0);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.2);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
         }
         
         .success-message h2 {
@@ -328,11 +315,9 @@
             background: #f9fafb;
             border-radius: 8px;
             padding: 20px;
-            margin: 20px 0;
+            margin: 20px auto;
             text-align: left;
             max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
         }
         
         .success-details p {
@@ -350,6 +335,7 @@
             gap: 15px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-top: 30px;
         }
         
         .btn-success-primary {
@@ -397,7 +383,19 @@
         .error-message p {
             color: #6b7280;
             font-size: 16px;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
+        }
+        
+        .error-details {
+            background: #fee2e2;
+            padding: 15px;
+            border-radius: 8px;
+            color: #991b1b;
+            font-size: 13px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: left;
+            word-break: break-word;
         }
         
         @media (max-width: 768px) {
@@ -453,7 +451,7 @@
                     <strong>ℹ️ Informació:</strong> La teva sol·licitud serà revisada pel responsable de trànsit. Rebràs una notificació quan sigui aprovada o rebutjada.
                 </div>
 
-                <form id="formAusencia">
+                <form id="formAusencia" novalidate>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Nº Personal</label>
@@ -497,7 +495,7 @@
                         <div class="form-group">
                             <label for="fechaFin">Data de fi (opcional)</label>
                             <input type="date" id="fechaFin">
-                            <div class="single-day-info" id="singleDayInfo">
+                            <div class="single-day-info">
                                 ✓ Si només és un dia, deixa aquest camp buit. S'aplicarà la mateixa data d'inici.
                             </div>
                         </div>
@@ -508,9 +506,9 @@
                         <div class="horario-box" id="horarioBox">
                             <div class="horario-row">
                                 <span>De:</span>
-                                <input type="time" id="horaInicio" required>
+                                <input type="time" id="horaInicio">
                                 <span>a:</span>
-                                <input type="time" id="horaFin" required>
+                                <input type="time" id="horaFin">
                             </div>
                             <div class="horario-info">
                                 Indica l'horari concret del permís sindical
@@ -525,7 +523,7 @@
 
                     <div class="btn-group">
                         <button type="button" class="btn-secondary" onclick="window.location.href='dashboard.html'">← Tornar al menú</button>
-                        <button type="submit" class="btn-primary" id="btnEnviar">Enviar sol·licitud</button>
+                        <button type="button" class="btn-primary" id="btnEnviar" onclick="enviarSolicitud()">Enviar sol·licitud</button>
                     </div>
                 </form>
             </div>
@@ -547,6 +545,7 @@
                 <div class="error-icon">❌</div>
                 <h2>Error al enviar la sol·licitud</h2>
                 <p>Hi ha hagut un problema. Si us plau, torna-ho a provar.</p>
+                <div class="error-details" id="errorDetails"></div>
                 <div class="success-actions">
                     <button class="btn-success-secondary" onclick="volverAlFormulario()">← Tornar al formulari</button>
                     <button class="btn-success-primary" onclick="window.location.href='dashboard.html'">← Tornar al menú</button>
@@ -556,6 +555,8 @@
     </div>
 
     <script>
+        console.log('🚀 Script cargado correctamente');
+        
         const firebaseConfig = {
             apiKey: "AIzaSyAgydw6LkHb0QkIR3aZDSmcsGFDfDFX4rM",
             authDomain: "emt-intranet.firebaseapp.com",
@@ -569,48 +570,59 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
+        console.log('🔥 Firebase inicializado');
+        
         let currentUserData = null;
         
         auth.onAuthStateChanged(async (user) => {
+            console.log('👤 Estado de auth:', user ? user.email : 'No autenticado');
+            
             if (!user) {
+                console.log(' No hay usuario, redirigiendo al login');
                 window.location.href = 'index.html';
                 return;
             }
             
-            const userDoc = await db.collection('usuarios').doc(user.uid).get();
-            
-            if (!userDoc.exists) {
-                alert('Usuari no trobat.');
-                await auth.signOut();
-                window.location.href = 'index.html';
-                return;
+            try {
+                const userDoc = await db.collection('usuarios').doc(user.uid).get();
+                console.log('📄 Documento usuario:', userDoc.exists ? 'Existe' : 'No existe');
+                
+                if (!userDoc.exists) {
+                    alert('Usuari no trobat.');
+                    await auth.signOut();
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                currentUserData = userDoc.data();
+                console.log('✅ Datos usuario:', currentUserData);
+                
+                document.getElementById('userName').textContent = currentUserData.nombre;
+                document.getElementById('userRol').textContent = currentUserData.rol;
+                document.getElementById('numeroPersonal').value = currentUserData.numeroPersonal || '';
+                document.getElementById('nombreCompleto').value = currentUserData.nombre;
+                
+                const hoy = new Date().toISOString().split('T')[0];
+                document.getElementById('fechaInicio').min = hoy;
+                document.getElementById('fechaFin').min = hoy;
+                
+            } catch (error) {
+                console.error('❌ Error cargando usuario:', error);
+                alert('Error al carregar les dades de l\'usuari: ' + error.message);
             }
-            
-            currentUserData = userDoc.data();
-            
-            document.getElementById('userName').textContent = currentUserData.nombre;
-            document.getElementById('userRol').textContent = currentUserData.rol;
-            document.getElementById('numeroPersonal').value = currentUserData.numeroPersonal || '';
-            document.getElementById('nombreCompleto').value = currentUserData.nombre;
-            
-            const hoy = new Date().toISOString().split('T')[0];
-            document.getElementById('fechaInicio').min = hoy;
-            document.getElementById('fechaFin').min = hoy;
-            
-            document.getElementById('singleDayInfo').classList.add('show');
         });
         
         document.getElementById('tipoAusencia').addEventListener('change', function() {
+            console.log('🔄 Tipo cambiado a:', this.value);
+            
             const otroTipoGroup = document.getElementById('otroTipoGroup');
             const horasGroup = document.getElementById('horasGroup');
             const horarioBox = document.getElementById('horarioBox');
             
             if (this.value === 'altres') {
                 otroTipoGroup.style.display = 'block';
-                document.getElementById('otroTipo').required = true;
             } else {
                 otroTipoGroup.style.display = 'none';
-                document.getElementById('otroTipo').required = false;
                 document.getElementById('otroTipo').value = '';
             }
             
@@ -625,15 +637,44 @@
             }
         });
         
-        document.getElementById('formAusencia').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        async function enviarSolicitud() {
+            console.log('📤 Intentando enviar solicitud...');
+            
+            // Validaciones manuales
+            const tipoAusencia = document.getElementById('tipoAusencia').value;
+            const fechaInicio = document.getElementById('fechaInicio').value;
+            
+            if (!tipoAusencia) {
+                alert('Si us plau, selecciona un tipus d\'absència.');
+                return;
+            }
+            
+            if (!fechaInicio) {
+                alert('Si us plau, selecciona la data d\'inici.');
+                return;
+            }
+            
+            if (tipoAusencia === 'altres' && !document.getElementById('otroTipo').value.trim()) {
+                alert('Si us plau, especifica el tipus d\'absència.');
+                return;
+            }
+            
+            if (tipoAusencia === 'permis_sindical') {
+                const horaInicio = document.getElementById('horaInicio').value;
+                const horaFin = document.getElementById('horaFin').value;
+                if (!horaInicio || !horaFin) {
+                    alert('Si us plau, indica l\'horari del permís sindical.');
+                    return;
+                }
+            }
+            
+            console.log('✅ Validaciones pasadas');
             
             const btnEnviar = document.getElementById('btnEnviar');
             btnEnviar.disabled = true;
             btnEnviar.textContent = 'Enviant...';
             
             try {
-                let tipoAusencia = document.getElementById('tipoAusencia').value;
                 let tipoAusenciaTexto = '';
                 
                 if (tipoAusencia === 'altres') {
@@ -656,9 +697,7 @@
                     tipoAusenciaTexto = tiposMap[tipoAusencia];
                 }
                 
-                const fechaInicio = document.getElementById('fechaInicio').value;
                 let fechaFin = document.getElementById('fechaFin').value;
-                
                 if (!fechaFin) {
                     fechaFin = fechaInicio;
                 }
@@ -679,9 +718,13 @@
                     fechaSolicitud: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
-                await db.collection('solicitudes').add(solicitud);
+                console.log('📝 Datos a enviar:', solicitud);
+                console.log(' Guardando en Firestore...');
                 
-                // Mostrar resumen de la solicitud
+                const docRef = await db.collection('solicitudes').add(solicitud);
+                console.log('✅ Solicitud guardada con ID:', docRef.id);
+                
+                // Mostrar resumen
                 const fechaInicioFormateada = new Date(fechaInicio).toLocaleDateString('ca-ES');
                 const fechaFinFormateada = new Date(fechaFin).toLocaleDateString('ca-ES');
                 
@@ -701,32 +744,28 @@
                 
                 document.getElementById('successDetails').innerHTML = resumenHTML;
                 
-                // Ocultar formulario y mostrar mensaje de éxito
+                // Ocultar formulario y mostrar éxito
                 document.getElementById('formContainer').style.display = 'none';
                 document.getElementById('successMessage').classList.add('show');
                 
             } catch (error) {
-                console.error('Error:', error);
-                
-                // Ocultar formulario y mostrar mensaje de error
+                console.error(' Error al enviar:', error);
+                document.getElementById('errorDetails').textContent = error.message;
                 document.getElementById('formContainer').style.display = 'none';
                 document.getElementById('errorMessage').classList.add('show');
             }
             
             btnEnviar.disabled = false;
             btnEnviar.textContent = 'Enviar sol·licitud';
-        });
+        }
         
         function nuevaSolicitud() {
-            // Resetear formulario
             document.getElementById('formAusencia').reset();
             document.getElementById('numeroPersonal').value = currentUserData.numeroPersonal || '';
             document.getElementById('nombreCompleto').value = currentUserData.nombre;
             document.getElementById('otroTipoGroup').style.display = 'none';
             document.getElementById('horasGroup').style.display = 'none';
-            document.getElementById('singleDayInfo').classList.add('show');
             
-            // Ocultar mensajes y mostrar formulario
             document.getElementById('successMessage').classList.remove('show');
             document.getElementById('errorMessage').classList.remove('show');
             document.getElementById('formContainer').style.display = 'block';
