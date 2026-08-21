@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMT Tarragona - Sol·licitud d'absència</title>
+    <title>EMT Tarragona - Intranet</title>
     
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -23,6 +23,16 @@
             min-height: 100vh;
         }
         
+        /* VISTAS - Solo se muestra una a la vez */
+        .vista {
+            display: none;
+        }
+        
+        .vista.activa {
+            display: block;
+        }
+        
+        /* CABECERA */
         .header {
             background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
             color: white;
@@ -94,8 +104,9 @@
             background: #fee2e2;
         }
         
+        /* CONTENIDO */
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 30px auto;
             padding: 0 20px;
         }
@@ -193,7 +204,6 @@
         .btn-primary {
             background: #dc2626;
             color: white;
-            flex: 1;
         }
         
         .btn-primary:hover {
@@ -274,13 +284,8 @@
         
         /* MENSAJE DE CONFIRMACIÓN */
         .success-message {
-            display: none;
             text-align: center;
             padding: 40px 20px;
-        }
-        
-        .success-message.show {
-            display: block;
         }
         
         .success-icon {
@@ -338,64 +343,424 @@
             margin-top: 30px;
         }
         
-        .btn-success-primary {
-            background: #dc2626;
-            color: white;
-            padding: 12px 30px;
+        /* DASHBOARD */
+        .welcome {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid #dc2626;
         }
         
-        .btn-success-primary:hover {
-            background: #b91c1c;
+        .welcome h2 {
+            color: #dc2626;
+            margin-bottom: 8px;
         }
         
-        .btn-success-secondary {
-            background: #e5e7eb;
-            color: #374151;
-            padding: 12px 30px;
+        .welcome p {
+            color: #6b7280;
         }
         
-        .btn-success-secondary:hover {
-            background: #d1d5db;
+        .section-title {
+            color: #1f2937;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dc2626;
         }
         
-        /* ERROR */
-        .error-message {
-            display: none;
-            text-align: center;
-            padding: 40px 20px;
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
         
-        .error-message.show {
-            display: block;
+        .menu-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
         }
         
-        .error-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
+        .menu-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.15);
+            border-color: #dc2626;
         }
         
-        .error-message h2 {
-            color: #991b1b;
-            font-size: 24px;
+        .menu-card-icon {
+            font-size: 36px;
             margin-bottom: 15px;
         }
         
-        .error-message p {
-            color: #6b7280;
-            font-size: 16px;
-            margin-bottom: 10px;
+        .menu-card h3 {
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-size: 18px;
         }
         
-        .error-details {
-            background: #fee2e2;
-            padding: 15px;
-            border-radius: 8px;
-            color: #991b1b;
+        .menu-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #dc2626;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        /* TABLAS */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #dc2626;
+        }
+        
+        .stat-label {
+            color: #6b7280;
             font-size: 13px;
-            margin: 20px auto;
-            max-width: 500px;
+            margin-top: 5px;
+        }
+        
+        .filters-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .filters-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #374151;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .filters-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            padding: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h3 {
+            color: #1f2937;
+        }
+        
+        .results-count {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #f9fafb;
+        }
+        
+        th {
+            padding: 12px 15px;
             text-align: left;
-            word-break: break-word;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+            color: #1f2937;
+        }
+        
+        tr:hover {
+            background: #f9fafb;
+        }
+        
+        .badge-pendiente {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-aprobada {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-rechazada {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .solicitud-item {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .solicitud-item:last-child {
+            border-bottom: none;
+        }
+        
+        .solicitud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .solicitud-info h3 {
+            color: #1f2937;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .solicitud-meta {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .solicitud-meta span {
+            margin-right: 15px;
+        }
+        
+        .solicitud-detalles {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .solicitud-detalles p {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .solicitud-detalles strong {
+            color: #374151;
+        }
+        
+        .solicitud-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-approve {
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+        }
+        
+        .btn-approve:hover {
+            background: #059669;
+        }
+        
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+            padding: 8px 16px;
+        }
+        
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+        
+        .btn-ver {
+            background: #3b82f6;
+            color: white;
+            padding: 6px 12px;
+        }
+        
+        .btn-ver:hover {
+            background: #2563eb;
+        }
+        
+        .observaciones-box {
+            background: #f3f4f6;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 3px solid #6b7280;
+        }
+        
+        .observaciones-box.aprobada {
+            border-left-color: #10b981;
+            background: #d1fae5;
+        }
+        
+        .observaciones-box.rechazada {
+            border-left-color: #ef4444;
+            background: #fee2e2;
+        }
+        
+        .observaciones-box strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        /* MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            border-bottom: 2px solid #dc2626;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            color: #dc2626;
+            font-size: 20px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .modal-close:hover {
+            color: #dc2626;
+        }
+        
+        .detail-row {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 15px;
+            color: #1f2937;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
         }
         
         @media (max-width: 768px) {
@@ -404,11 +769,11 @@
                 gap: 10px;
             }
             
-            .form-row {
+            .form-row, .filters-grid {
                 grid-template-columns: 1fr;
             }
             
-            .btn-group {
+            .btn-group, .filters-actions, .success-actions {
                 flex-direction: column;
             }
             
@@ -416,15 +781,12 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
-            .success-actions {
-                flex-direction: column;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
+    <!-- CABECERA (Oculta en login) -->
+    <div class="header" id="mainHeader" style="display: none;">
         <div class="header-left">
             <img src="logo-emt.png" alt="EMT Tarragona" class="header-logo">
             <div class="header-title">Intranet EMT de Tarragona</div>
@@ -439,9 +801,66 @@
     </div>
 
     <div class="container">
-        <div class="form-card">
-            <!-- FORMULARIO -->
-            <div id="formContainer">
+        <!-- VISTA 1: LOGIN -->
+        <div id="vista-login" class="vista activa">
+            <div class="form-card" style="max-width: 400px; margin: 50px auto;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <img src="logo-emt.png" alt="EMT" style="max-width: 150px; margin-bottom: 20px;">
+                    <h1 style="color: #dc2626; margin-bottom: 10px;">Intranet de Personal</h1>
+                    <p style="color: #6b7280;">Gestión de permisos, vacaciones y servicios</p>
+                </div>
+                
+                <div id="loginError" class="alert-error" style="background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none;"></div>
+                
+                <div class="form-group">
+                    <label>Correu electrònic</label>
+                    <input type="email" id="loginEmail" placeholder="nom@emttarragona.cat">
+                </div>
+                
+                <div class="form-group">
+                    <label>Contrasenya</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••">
+                </div>
+                
+                <button class="btn-primary" onclick="login()" style="width: 100%; margin-bottom: 15px;">Accedir</button>
+                
+                <div style="text-align: center; color: #6b7280; margin: 20px 0;">o</div>
+                
+                <button class="btn-secondary" onclick="loginGoogle()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Accedir amb Google
+                </button>
+            </div>
+        </div>
+
+        <!-- VISTA 2: DASHBOARD -->
+        <div id="vista-dashboard" class="vista">
+            <div class="welcome">
+                <h2 id="welcomeText">Benvingut/da!</h2>
+                <p>Selecciona una opció del menú per començar.</p>
+            </div>
+
+            <div class="section-title">📝 Les meves gestions</div>
+            <div class="menu-grid" id="menuPersonal">
+                <!-- Se genera dinámicamente -->
+            </div>
+
+            <div id="seccionGestion" style="display: none;">
+                <div class="section-title">👨‍ Gestió d'equip</div>
+                <div class="menu-grid" id="menuGestion">
+                    <!-- Se genera dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 3: AUSENCIAS -->
+        <div id="vista-ausencias" class="vista">
+            <div class="form-card">
                 <div class="form-header">
                     <h2>📋 Sol·licitud d'absència</h2>
                     <p>Completa el formulari per sol·licitar permisos, vacances o altres absències.</p>
@@ -522,40 +941,181 @@
                     </div>
 
                     <div class="btn-group">
-                        <button type="button" class="btn-secondary" onclick="window.location.href='dashboard.html'">← Tornar al menú</button>
+                        <button type="button" class="btn-secondary" onclick="navegarA('vista-dashboard')">← Tornar al menú</button>
                         <button type="button" class="btn-primary" id="btnEnviar" onclick="enviarSolicitud()">Enviar sol·licitud</button>
                     </div>
                 </form>
+
+                <!-- MENSAJE DE ÉXITO -->
+                <div id="successMessage" class="success-message" style="display: none;">
+                    <div class="success-icon">✅</div>
+                    <h2>Sol·licitud enviada correctament!</h2>
+                    <p>La teva sol·licitud serà revisada pel responsable de trànsit. Rebràs una notificació quan sigui aprovada o rebutjada.</p>
+                    <div class="success-details" id="successDetails"></div>
+                    <div class="success-actions">
+                        <button class="btn-secondary" onclick="nuevaSolicitud()">📝 Nova sol·licitud</button>
+                        <button class="btn-primary" onclick="navegarA('vista-dashboard')">← Tornar al menú</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 4: PENDIENTES (Solo responsables) -->
+        <div id="vista-pendientes" class="vista">
+            <div class="page-header">
+                <h1 style="color: #dc2626; margin-bottom: 10px;">✅ Peticions pendents</h1>
+                <p style="color: #6b7280;">Revisa i gestiona les sol·licituds dels conductors.</p>
             </div>
 
-            <!-- MENSAJE DE ÉXITO -->
-            <div id="successMessage" class="success-message">
-                <div class="success-icon">✅</div>
-                <h2>Sol·licitud enviada correctament!</h2>
-                <p>La teva sol·licitud serà revisada pel responsable de trànsit. Rebràs una notificació quan sigui aprovada o rebutjada.</p>
-                <div class="success-details" id="successDetails"></div>
-                <div class="success-actions">
-                    <button class="btn-success-secondary" onclick="nuevaSolicitud()">📝 Nova sol·licitud</button>
-                    <button class="btn-success-primary" onclick="window.location.href='dashboard.html'">← Tornar al menú</button>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="countPendiente">0</div>
+                    <div class="stat-label">Pendents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="countAprobada">0</div>
+                    <div class="stat-label">Aprovades</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="countRechazada">0</div>
+                    <div class="stat-label">Rebutjades</div>
                 </div>
             </div>
 
-            <!-- MENSAJE DE ERROR -->
-            <div id="errorMessage" class="error-message">
-                <div class="error-icon">❌</div>
-                <h2>Error al enviar la sol·licitud</h2>
-                <p>Hi ha hagut un problema. Si us plau, torna-ho a provar.</p>
-                <div class="error-details" id="errorDetails"></div>
-                <div class="success-actions">
-                    <button class="btn-success-secondary" onclick="volverAlFormulario()">← Tornar al formulari</button>
-                    <button class="btn-success-primary" onclick="window.location.href='dashboard.html'">← Tornar al menú</button>
+            <div class="filters-card">
+                <div class="filters-title">🔍 Filtres</div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Estat</label>
+                        <select id="filterEstado">
+                            <option value="todos">Tots</option>
+                            <option value="pendiente">Pendents</option>
+                            <option value="aprobada">Aprovades</option>
+                            <option value="rechazada">Rebutjades</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Tipus</label>
+                        <select id="filterTipo">
+                            <option value="todos">Tots</option>
+                            <option value="vacances">Vacances</option>
+                            <option value="assumptes_propis">Assumptes propis</option>
+                            <option value="permis_sindical">Permís sindical</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filters-actions">
+                    <button class="btn-secondary" onclick="filtrarSolicitudes()">🔍 Cercar</button>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-header">
+                    <h3>📋 Sol·licituds</h3>
+                    <div class="results-count" id="resultsCount">0 sol·licituds</div>
+                </div>
+                <div id="listaSolicitudes">
+                    <div class="loading">Carregant...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 5: HISTÓRICO (Solo responsables) -->
+        <div id="vista-historico" class="vista">
+            <div class="page-header">
+                <h1 style="color: #dc2626; margin-bottom: 10px;"> Històric de sol·licituds</h1>
+                <p style="color: #6b7280;">Consulta totes les sol·licituds amb filtres avançats.</p>
+            </div>
+
+            <div class="filters-card">
+                <div class="filters-title">🔍 Filtres avançats</div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Estat</label>
+                        <select id="histFilterEstado">
+                            <option value="todos">Tots</option>
+                            <option value="pendiente">Pendents</option>
+                            <option value="aprobada">Aprovades</option>
+                            <option value="rechazada">Rebutjades</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Nº Personal</label>
+                        <input type="text" id="histFilterNumero" placeholder="Ex: 126">
+                    </div>
+                    <div class="filter-group">
+                        <label>Data des de</label>
+                        <input type="date" id="histFilterFechaDesde">
+                    </div>
+                    <div class="filter-group">
+                        <label>Data fins</label>
+                        <input type="date" id="histFilterFechaHasta">
+                    </div>
+                </div>
+                <div class="filters-actions">
+                    <button class="btn-secondary" onclick="limpiarFiltros()">🗑️ Netejar</button>
+                    <button class="btn-primary" onclick="aplicarFiltrosHistorico()"> Cercar</button>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-header">
+                    <h3>📋 Resultats</h3>
+                    <div class="results-count" id="histResultsCount">0 sol·licituds</div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Nº Personal</th>
+                                <th>Nom</th>
+                                <th>Tipus</th>
+                                <th>Període</th>
+                                <th>Estat</th>
+                                <th>Accions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyHistorico">
+                            <tr><td colspan="7" class="loading">Carregant...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- MODAL OBSERVACIONES -->
+    <div class="modal-overlay" id="modalObservaciones">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Observacions</h3>
+                <button class="modal-close" onclick="cerrarModal()">✕</button>
+            </div>
+            <div class="modal-body" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Observacions (opcional)</label>
+                <textarea id="observaciones" placeholder="Ex: Has de presentar el justificant..." style="width: 100%; min-height: 100px; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px;"></textarea>
+            </div>
+            <div class="filters-actions">
+                <button class="btn-secondary" onclick="cerrarModal()">Cancel·lar</button>
+                <button class="btn-primary" id="btnConfirmarAccion" onclick="confirmarAccion()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE -->
+    <div class="modal-overlay" id="modalDetalle">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>📋 Detall de la sol·licitud</h3>
+                <button class="modal-close" onclick="cerrarModalDetalle()">✕</button>
+            </div>
+            <div id="modalDetalleContent"></div>
+        </div>
+    </div>
+
     <script>
-        console.log('🚀 Script cargado correctamente');
+        console.log('🚀 Intranet EMT - SPA cargada');
         
         const firebaseConfig = {
             apiKey: "AIzaSyAgydw6LkHb0QkIR3aZDSmcsGFDfDFX4rM",
@@ -570,51 +1130,193 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        console.log(' Firebase inicializado');
-        
         let currentUserData = null;
+        let allSolicitudes = [];
+        let solicitudActualId = null;
+        let accionActual = null;
         
+        // SISTEMA DE NAVEGACIÓN
+        function navegarA(idVista) {
+            console.log('🔄 Navegando a:', idVista);
+            
+            // Ocultar todas las vistas
+            document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
+            
+            // Mostrar la vista solicitada
+            document.getElementById(idVista).classList.add('activa');
+            
+            // Gestionar cabecera
+            const header = document.getElementById('mainHeader');
+            if (idVista === 'vista-login') {
+                header.style.display = 'none';
+            } else {
+                header.style.display = 'flex';
+            }
+            
+            // Scroll al inicio
+            window.scrollTo(0, 0);
+        }
+        
+        // AUTH STATE
         auth.onAuthStateChanged(async (user) => {
-            console.log('👤 Estado de auth:', user ? user.email : 'No autenticado');
+            console.log(' Auth state:', user ? user.email : 'No autenticado');
             
             if (!user) {
-                console.log('🔒 No hay usuario, redirigiendo al login');
-                window.location.href = 'index.html';
+                navegarA('vista-login');
                 return;
             }
             
             try {
                 const userDoc = await db.collection('usuarios').doc(user.uid).get();
-                console.log('📄 Documento usuario:', userDoc.exists ? 'Existe' : 'No existe');
                 
                 if (!userDoc.exists) {
                     alert('Usuari no trobat.');
                     await auth.signOut();
-                    window.location.href = 'index.html';
+                    navegarA('vista-login');
                     return;
                 }
                 
                 currentUserData = userDoc.data();
-                console.log('✅ Datos usuario:', currentUserData);
+                console.log('✅ Usuario:', currentUserData);
                 
+                // Actualizar UI
                 document.getElementById('userName').textContent = currentUserData.nombre;
                 document.getElementById('userRol').textContent = currentUserData.rol;
+                document.getElementById('welcomeText').textContent = `Benvingut/da, ${currentUserData.nombre}!`;
                 document.getElementById('numeroPersonal').value = currentUserData.numeroPersonal || '';
                 document.getElementById('nombreCompleto').value = currentUserData.nombre;
                 
-                const hoy = new Date().toISOString().split('T')[0];
-                document.getElementById('fechaInicio').min = hoy;
-                document.getElementById('fechaFin').min = hoy;
+                // Generar menú
+                generarMenu();
+                
+                // Ir al dashboard
+                navegarA('vista-dashboard');
                 
             } catch (error) {
-                console.error('❌ Error cargando usuario:', error);
-                alert('Error al carregar les dades de l\'usuari: ' + error.message);
+                console.error('❌ Error:', error);
+                alert('Error al carregar les dades: ' + error.message);
             }
         });
         
-        document.getElementById('tipoAusencia').addEventListener('change', function() {
-            console.log('🔄 Tipo cambiado a:', this.value);
+        function generarMenu() {
+            const menuPersonal = document.getElementById('menuPersonal');
+            menuPersonal.innerHTML = '';
             
+            const opcionesPersonales = [
+                { icon: '📋', titulo: 'Sol·licitud d\'absència', descripcion: 'Demana permisos, vacances, hores de comptador, etc.', vista: 'vista-ausencias' },
+                { icon: '🔄', titulo: 'Intercanvi de servei', descripcion: 'Proposa un canvi de servei amb un altre conductor.', vista: 'vista-dashboard' },
+                { icon: '️', titulo: 'Canvi de vacances', descripcion: 'Intercanvia les teves vacances amb un company.', vista: 'vista-dashboard' },
+                { icon: '📰', titulo: 'Tauler de comunicats', descripcion: 'Consulta les últimes notícies i comunicats.', vista: 'vista-dashboard' }
+            ];
+            
+            opcionesPersonales.forEach(opcion => {
+                const card = document.createElement('div');
+                card.className = 'menu-card';
+                card.onclick = () => navegarA(opcion.vista);
+                card.innerHTML = `
+                    <div class="menu-card-icon">${opcion.icon}</div>
+                    <h3>${opcion.titulo}</h3>
+                    <p>${opcion.descripcion}</p>
+                `;
+                menuPersonal.appendChild(card);
+            });
+            
+            // Si es responsable, mostrar menú de gestión
+            const rol = currentUserData.rol;
+            if (rol === 'responsable_trafico' || rol === 'responsable_planificacion' || rol === 'admin') {
+                document.getElementById('seccionGestion').style.display = 'block';
+                
+                const menuGestion = document.getElementById('menuGestion');
+                menuGestion.innerHTML = '';
+                
+                const opcionesGestion = [
+                    { icon: '✅', titulo: 'Peticions pendents', descripcion: 'Revisa i autoritza les sol·licituds.', vista: 'vista-pendientes', badge: true },
+                    { icon: '', titulo: 'Històric de sol·licituds', descripcion: 'Consulta totes les sol·licituds.', vista: 'vista-historico' }
+                ];
+                
+                opcionesGestion.forEach(opcion => {
+                    const card = document.createElement('div');
+                    card.className = 'menu-card';
+                    card.onclick = () => {
+                        navegarA(opcion.vista);
+                        if (opcion.vista === 'vista-pendientes') cargarSolicitudes();
+                        if (opcion.vista === 'vista-historico') cargarHistorico();
+                    };
+                    card.innerHTML = `
+                        <div class="menu-card-icon">${opcion.icon}</div>
+                        <h3>${opcion.titulo}${opcion.badge ? '<span class="badge">Nou</span>' : ''}</h3>
+                        <p>${opcion.descripcion}</p>
+                    `;
+                    menuGestion.appendChild(card);
+                });
+            } else {
+                document.getElementById('seccionGestion').style.display = 'none';
+            }
+        }
+        
+        // LOGIN
+        async function login() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                mostrarLoginError('Si us plau, introdueix email i contrasenya');
+                return;
+            }
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                // onAuthStateChanged se encargará del resto
+            } catch (error) {
+                console.error('Error login:', error);
+                let mensaje = 'Error d\'autenticació';
+                if (error.code === 'auth/user-not-found') mensaje = 'Usuari no trobat';
+                if (error.code === 'auth/wrong-password') mensaje = 'Contrasenya incorrecta';
+                mostrarLoginError(mensaje);
+            }
+        }
+        
+        async function loginGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                const userDoc = await db.collection('usuarios').doc(user.uid).get();
+                if (!userDoc.exists) {
+                    await db.collection('usuarios').doc(user.uid).set({
+                        nombre: user.displayName,
+                        email: user.email,
+                        rol: 'conductor',
+                        numeroPersonal: '',
+                        activo: true,
+                        fechaCreacion: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                // onAuthStateChanged se encargará del resto
+            } catch (error) {
+                console.error('Error Google:', error);
+                mostrarLoginError('Error amb Google');
+            }
+        }
+        
+        function mostrarLoginError(msg) {
+            const errorDiv = document.getElementById('loginError');
+            errorDiv.textContent = msg;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 5000);
+        }
+        
+        async function logout() {
+            if (confirm('Segur que vols sortir?')) {
+                await auth.signOut();
+                sessionStorage.clear();
+                navegarA('vista-login');
+            }
+        }
+        
+        // AUSENCIAS
+        document.getElementById('tipoAusencia').addEventListener('change', function() {
             const otroTipoGroup = document.getElementById('otroTipoGroup');
             const horasGroup = document.getElementById('horasGroup');
             const horarioBox = document.getElementById('horarioBox');
@@ -638,37 +1340,19 @@
         });
         
         async function enviarSolicitud() {
-            console.log('📤 Intentando enviar solicitud...');
-            
-            // Validaciones manuales
             const tipoAusencia = document.getElementById('tipoAusencia').value;
             const fechaInicio = document.getElementById('fechaInicio').value;
             
-            if (!tipoAusencia) {
-                alert('Si us plau, selecciona un tipus d\'absència.');
-                return;
-            }
-            
-            if (!fechaInicio) {
-                alert('Si us plau, selecciona la data d\'inici.');
-                return;
-            }
-            
+            if (!tipoAusencia) { alert('Selecciona un tipus d\'absència'); return; }
+            if (!fechaInicio) { alert('Selecciona la data d\'inici'); return; }
             if (tipoAusencia === 'altres' && !document.getElementById('otroTipo').value.trim()) {
-                alert('Si us plau, especifica el tipus d\'absència.');
-                return;
+                alert('Especifica el tipus'); return;
             }
-            
             if (tipoAusencia === 'permis_sindical') {
                 const horaInicio = document.getElementById('horaInicio').value;
                 const horaFin = document.getElementById('horaFin').value;
-                if (!horaInicio || !horaFin) {
-                    alert('Si us plau, indica l\'horari del permís sindical.');
-                    return;
-                }
+                if (!horaInicio || !horaFin) { alert('Indica l\'horari'); return; }
             }
-            
-            console.log('✅ Validaciones pasadas');
             
             const btnEnviar = document.getElementById('btnEnviar');
             btnEnviar.disabled = true;
@@ -676,31 +1360,20 @@
             
             try {
                 let tipoAusenciaTexto = '';
-                
                 if (tipoAusencia === 'altres') {
                     tipoAusenciaTexto = document.getElementById('otroTipo').value.trim();
                 } else {
                     const tiposMap = {
-                        'assumptes_propis': 'Assumptes propis',
-                        'altres': 'Altres',
-                        'baja_medica': 'Baixa mèdica',
-                        'defuncio_familiar': 'Defunció familiar',
-                        'examen': 'Exàmens',
-                        'horas_contador': 'Hores de comptador',
-                        'malaltia_greu': 'Malaltia greu familiar',
-                        'matrimoni': 'Matrimoni',
-                        'matrimoni_fill': 'Matrimoni fill',
-                        'mudanca': 'Mudança',
-                        'permis_sindical': 'Permís sindical',
-                        'vacances': 'Vacances'
+                        'assumptes_propis': 'Assumptes propis', 'altres': 'Altres', 'baja_medica': 'Baixa mèdica',
+                        'defuncio_familiar': 'Defunció familiar', 'examen': 'Exàmens', 'horas_contador': 'Hores comptador',
+                        'malaltia_greu': 'Malaltia greu familiar', 'matrimoni': 'Matrimoni', 'matrimoni_fill': 'Matrimoni fill',
+                        'mudanca': 'Mudança', 'permis_sindical': 'Permís sindical', 'vacances': 'Vacances'
                     };
                     tipoAusenciaTexto = tiposMap[tipoAusencia];
                 }
                 
                 let fechaFin = document.getElementById('fechaFin').value;
-                if (!fechaFin) {
-                    fechaFin = fechaInicio;
-                }
+                if (!fechaFin) fechaFin = fechaInicio;
                 
                 const solicitud = {
                     userId: auth.currentUser.uid,
@@ -718,24 +1391,14 @@
                     fechaSolicitud: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
-                console.log('📝 Datos a enviar:', solicitud);
-                console.log('💾 Guardando en Firestore...');
+                await db.collection('solicitudes').add(solicitud);
                 
-                const docRef = await db.collection('solicitudes').add(solicitud);
-                console.log('✅ Solicitud guardada con ID:', docRef.id);
-                
-                // Mostrar resumen
+                // Mostrar éxito
                 const fechaInicioFormateada = new Date(fechaInicio).toLocaleDateString('ca-ES');
                 const fechaFinFormateada = new Date(fechaFin).toLocaleDateString('ca-ES');
                 
-                let resumenHTML = `
-                    <p><strong>Tipus:</strong> ${tipoAusenciaTexto}</p>
-                    <p><strong>Període:</strong> ${fechaInicioFormateada}`;
-                
-                if (fechaInicio !== fechaFin) {
-                    resumenHTML += ` - ${fechaFinFormateada}`;
-                }
-                
+                let resumenHTML = `<p><strong>Tipus:</strong> ${tipoAusenciaTexto}</p><p><strong>Període:</strong> ${fechaInicioFormateada}`;
+                if (fechaInicio !== fechaFin) resumenHTML += ` - ${fechaFinFormateada}`;
                 resumenHTML += `</p>`;
                 
                 if (document.getElementById('horaInicio').value) {
@@ -743,16 +1406,12 @@
                 }
                 
                 document.getElementById('successDetails').innerHTML = resumenHTML;
-                
-                // Ocultar formulario y mostrar éxito
-                document.getElementById('formContainer').style.display = 'none';
-                document.getElementById('successMessage').classList.add('show');
+                document.getElementById('formAusencia').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
                 
             } catch (error) {
-                console.error('❌ Error al enviar:', error);
-                document.getElementById('errorDetails').textContent = error.message;
-                document.getElementById('formContainer').style.display = 'none';
-                document.getElementById('errorMessage').classList.add('show');
+                console.error('Error:', error);
+                alert('Error al enviar: ' + error.message);
             }
             
             btnEnviar.disabled = false;
@@ -765,24 +1424,299 @@
             document.getElementById('nombreCompleto').value = currentUserData.nombre;
             document.getElementById('otroTipoGroup').style.display = 'none';
             document.getElementById('horasGroup').style.display = 'none';
-            
-            document.getElementById('successMessage').classList.remove('show');
-            document.getElementById('errorMessage').classList.remove('show');
-            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('formAusencia').style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
         }
         
-        function volverAlFormulario() {
-            document.getElementById('errorMessage').classList.remove('show');
-            document.getElementById('formContainer').style.display = 'block';
-        }
-        
-        async function logout() {
-            if (confirm('Segur que vols sortir de la sessió?')) {
-                await auth.signOut();
-                sessionStorage.clear();
-                window.location.href = 'index.html';
+        // PENDIENTES
+        async function cargarSolicitudes() {
+            try {
+                const snapshot = await db.collection('solicitudes').orderBy('fechaSolicitud', 'desc').get();
+                allSolicitudes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                filtrarSolicitudes();
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('listaSolicitudes').innerHTML = '<div class="empty-state">Error</div>';
             }
         }
+        
+        function filtrarSolicitudes() {
+            const estado = document.getElementById('filterEstado').value;
+            const tipo = document.getElementById('filterTipo').value;
+            
+            let filtradas = allSolicitudes;
+            if (estado !== 'todos') filtradas = filtradas.filter(s => s.estado === estado);
+            if (tipo !== 'todos') filtradas = filtradas.filter(s => s.tipoAusencia === tipo);
+            
+            actualizarEstadisticas(filtradas);
+            mostrarListaSolicitudes(filtradas);
+        }
+        
+        function actualizarEstadisticas(solicitudes) {
+            document.getElementById('countPendiente').textContent = solicitudes.filter(s => s.estado === 'pendiente').length;
+            document.getElementById('countAprobada').textContent = solicitudes.filter(s => s.estado === 'aprobada').length;
+            document.getElementById('countRechazada').textContent = solicitudes.filter(s => s.estado === 'rechazada').length;
+            document.getElementById('resultsCount').textContent = `${solicitudes.length} sol·licituds`;
+        }
+        
+        function mostrarListaSolicitudes(solicitudes) {
+            const container = document.getElementById('listaSolicitudes');
+            
+            if (solicitudes.length === 0) {
+                container.innerHTML = '<div class="empty-state">No hi ha sol·licituds</div>';
+                return;
+            }
+            
+            const tiposMap = {
+                'vacances': 'Vacances', 'assumptes_propis': 'Assumptes propis', 'permis_sindical': 'Permís sindical',
+                'baja_medica': 'Baixa mèdica', 'defuncio_familiar': 'Defunció familiar', 'examen': 'Exàmens',
+                'horas_contador': 'Hores comptador', 'malaltia_greu': 'Malaltia greu familiar', 'matrimoni': 'Matrimoni',
+                'matrimoni_fill': 'Matrimoni fill', 'mudanca': 'Mudança', 'altres': 'Altres'
+            };
+            
+            const estadoText = { 'pendiente': 'Pendent', 'aprobada': 'Aprovada', 'rechazada': 'Rebutjada' };
+            
+            container.innerHTML = solicitudes.map(s => {
+                const fechaSolicitud = s.fechaSolicitud?.toDate().toLocaleDateString('ca-ES') || 'N/A';
+                const fechaInicio = new Date(s.fechaInicio).toLocaleDateString('ca-ES');
+                const fechaFin = new Date(s.fechaFin).toLocaleDateString('ca-ES');
+                
+                let observacionesHTML = '';
+                if (s.observaciones) {
+                    const obsClass = s.estado === 'aprobada' ? 'aprobada' : s.estado === 'rechazada' ? 'rechazada' : '';
+                    observacionesHTML = `<div class="observaciones-box ${obsClass}"><strong> Observacions:</strong><p>${s.observaciones}</p></div>`;
+                }
+                
+                return `
+                    <div class="solicitud-item">
+                        <div class="solicitud-header">
+                            <div class="solicitud-info">
+                                <h3>${s.nombre}</h3>
+                                <div class="solicitud-meta">
+                                    <span>👤 Nº ${s.numeroPersonal || 'N/A'}</span>
+                                    <span>📧 ${s.email}</span>
+                                    <span>📅 ${fechaSolicitud}</span>
+                                </div>
+                            </div>
+                            <span class="badge badge-${s.estado}">${estadoText[s.estado]}</span>
+                        </div>
+                        <div class="solicitud-detalles">
+                            <p><strong>Tipus:</strong> ${tiposMap[s.tipoAusencia] || s.tipoAusencia}</p>
+                            <p><strong>Període:</strong> ${fechaInicio} - ${fechaFin}</p>
+                            ${s.horas ? `<p><strong>Hores:</strong> ${s.horas}</p>` : ''}
+                            ${s.motivo ? `<p><strong>Motiu:</strong> ${s.motivo}</p>` : ''}
+                            ${observacionesHTML}
+                        </div>
+                        ${s.estado === 'pendiente' ? `
+                            <div class="solicitud-actions">
+                                <button class="btn-approve" onclick="abrirModal('${s.id}', 'aprobar')">✅ Aprovar</button>
+                                <button class="btn-reject" onclick="abrirModal('${s.id}', 'rechazar')">❌ Rebutjar</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function abrirModal(id, accion) {
+            solicitudActualId = id;
+            accionActual = accion;
+            
+            const modal = document.getElementById('modalObservaciones');
+            const title = document.getElementById('modalTitle');
+            const btnConfirmar = document.getElementById('btnConfirmarAccion');
+            
+            if (accion === 'aprobar') {
+                title.textContent = '✅ Aprovar sol·licitud';
+                btnConfirmar.textContent = 'Aprovar';
+                btnConfirmar.className = 'btn-primary';
+                btnConfirmar.style.background = '#10b981';
+            } else {
+                title.textContent = '❌ Rebutjar sol·licitud';
+                btnConfirmar.textContent = 'Rebutjar';
+                btnConfirmar.className = 'btn-primary';
+                btnConfirmar.style.background = '#ef4444';
+            }
+            
+            document.getElementById('observaciones').value = '';
+            modal.classList.add('active');
+        }
+        
+        function cerrarModal() {
+            document.getElementById('modalObservaciones').classList.remove('active');
+            solicitudActualId = null;
+            accionActual = null;
+        }
+        
+        async function confirmarAccion() {
+            const observaciones = document.getElementById('observaciones').value.trim();
+            
+            try {
+                const updateData = {
+                    estado: accionActual === 'aprobar' ? 'aprobada' : 'rechazada',
+                    fechaRespuesta: firebase.firestore.FieldValue.serverTimestamp(),
+                    responsableRespuesta: currentUserData.nombre
+                };
+                
+                if (observaciones) updateData.observaciones = observaciones;
+                
+                await db.collection('solicitudes').doc(solicitudActualId).update(updateData);
+                
+                cerrarModal();
+                await cargarSolicitudes();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al processar');
+            }
+        }
+        
+        // HISTÓRICO
+        async function cargarHistorico() {
+            try {
+                const snapshot = await db.collection('solicitudes').orderBy('fechaSolicitud', 'desc').get();
+                allSolicitudes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                aplicarFiltrosHistorico();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        function aplicarFiltrosHistorico() {
+            const estado = document.getElementById('histFilterEstado').value;
+            const numero = document.getElementById('histFilterNumero').value.toLowerCase().trim();
+            const fechaDesde = document.getElementById('histFilterFechaDesde').value;
+            const fechaHasta = document.getElementById('histFilterFechaHasta').value;
+            
+            let filtradas = allSolicitudes;
+            
+            if (estado !== 'todos') filtradas = filtradas.filter(s => s.estado === estado);
+            if (numero && (!s.numeroPersonal || !s.numeroPersonal.toLowerCase().includes(numero))) filtradas = filtradas.filter(s => s.numeroPersonal && s.numeroPersonal.toLowerCase().includes(numero));
+            
+            if (fechaDesde || fechaHasta) {
+                filtradas = filtradas.filter(s => {
+                    const fechaSolicitud = s.fechaSolicitud?.toDate();
+                    if (!fechaSolicitud) return false;
+                    if (fechaDesde && fechaSolicitud < new Date(fechaDesde)) return false;
+                    if (fechaHasta) {
+                        const hasta = new Date(fechaHasta);
+                        hasta.setHours(23, 59, 59);
+                        if (fechaSolicitud > hasta) return false;
+                    }
+                    return true;
+                });
+            }
+            
+            mostrarTablaHistorico(filtradas);
+        }
+        
+        function limpiarFiltros() {
+            document.getElementById('histFilterEstado').value = 'todos';
+            document.getElementById('histFilterNumero').value = '';
+            document.getElementById('histFilterFechaDesde').value = '';
+            document.getElementById('histFilterFechaHasta').value = '';
+            aplicarFiltrosHistorico();
+        }
+        
+        function mostrarTablaHistorico(solicitudes) {
+            const tbody = document.getElementById('tbodyHistorico');
+            
+            if (solicitudes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No s\'han trobat sol·licituds</td></tr>';
+                document.getElementById('histResultsCount').textContent = '0 sol·licituds';
+                return;
+            }
+            
+            const tiposMap = {
+                'vacances': 'Vacances', 'assumptes_propis': 'Assumptes propis', 'permis_sindical': 'Permís sindical',
+                'baja_medica': 'Baixa mèdica', 'defuncio_familiar': 'Defunció familiar', 'examen': 'Exàmens',
+                'horas_contador': 'Hores comptador', 'malaltia_greu': 'Malaltia greu familiar', 'matrimoni': 'Matrimoni',
+                'matrimoni_fill': 'Matrimoni fill', 'mudanca': 'Mudança', 'altres': 'Altres'
+            };
+            
+            const estadoText = { 'pendiente': 'Pendent', 'aprobada': 'Aprovada', 'rechazada': 'Rebutjada' };
+            
+            document.getElementById('histResultsCount').textContent = `${solicitudes.length} sol·licituds`;
+            
+            tbody.innerHTML = solicitudes.map(s => {
+                const fechaSolicitud = s.fechaSolicitud?.toDate().toLocaleDateString('ca-ES') || 'N/A';
+                const fechaInicio = new Date(s.fechaInicio).toLocaleDateString('ca-ES');
+                const fechaFin = new Date(s.fechaFin).toLocaleDateString('ca-ES');
+                
+                return `
+                    <tr>
+                        <td>${fechaSolicitud}</td>
+                        <td>${s.numeroPersonal || 'N/A'}</td>
+                        <td>${s.nombre || 'N/A'}</td>
+                        <td>${tiposMap[s.tipoAusencia] || s.tipoAusencia}</td>
+                        <td>${fechaInicio} - ${fechaFin}</td>
+                        <td><span class="badge badge-${s.estado}">${estadoText[s.estado]}</span></td>
+                        <td><button class="btn-ver" onclick="verDetalle('${s.id}')">👁️ Veure</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function verDetalle(id) {
+            const s = allSolicitudes.find(sol => sol.id === id);
+            if (!s) return;
+            
+            const tiposMap = {
+                'vacances': 'Vacances', 'assumptes_propis': 'Assumptes propis', 'permis_sindical': 'Permís sindical',
+                'baja_medica': 'Baixa mèdica', 'defuncio_familiar': 'Defunció familiar', 'examen': 'Exàmens',
+                'horas_contador': 'Hores comptador', 'malaltia_greu': 'Malaltia greu familiar', 'matrimoni': 'Matrimoni',
+                'matrimoni_fill': 'Matrimoni fill', 'mudanca': 'Mudança', 'altres': 'Altres'
+            };
+            
+            const estadoText = { 'pendiente': 'Pendent', 'aprobada': 'Aprovada', 'rechazada': 'Rebutjada' };
+            
+            const fechaSolicitud = s.fechaSolicitud?.toDate().toLocaleString('ca-ES') || 'N/A';
+            const fechaInicio = new Date(s.fechaInicio).toLocaleDateString('ca-ES');
+            const fechaFin = new Date(s.fechaFin).toLocaleDateString('ca-ES');
+            const fechaRespuesta = s.fechaRespuesta?.toDate().toLocaleString('ca-ES') || '-';
+            
+            let observacionesHTML = '';
+            if (s.observaciones) {
+                const obsClass = s.estado === 'aprobada' ? 'aprobada' : s.estado === 'rechazada' ? 'rechazada' : '';
+                observacionesHTML = `
+                    <div class="detail-row">
+                        <div class="detail-label">💬 Observacions</div>
+                        <div class="observaciones-box ${obsClass}"><p>${s.observaciones}</p></div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('modalDetalleContent').innerHTML = `
+                <div class="detail-row"><div class="detail-label">Estat</div><div class="detail-value"><span class="badge badge-${s.estado}">${estadoText[s.estado]}</span></div></div>
+                <div class="detail-row"><div class="detail-label">Conductor</div><div class="detail-value"><strong>${s.nombre}</strong> (Nº ${s.numeroPersonal || 'N/A'})</div></div>
+                <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${s.email}</div></div>
+                <div class="detail-row"><div class="detail-label">Tipus</div><div class="detail-value">${tiposMap[s.tipoAusencia] || s.tipoAusencia}</div></div>
+                <div class="detail-row"><div class="detail-label">Període</div><div class="detail-value">${fechaInicio} - ${fechaFin}</div></div>
+                ${s.horas ? `<div class="detail-row"><div class="detail-label">Hores</div><div class="detail-value">${s.horas}</div></div>` : ''}
+                ${s.motivo ? `<div class="detail-row"><div class="detail-label">Motiu</div><div class="detail-value">${s.motivo}</div></div>` : ''}
+                ${observacionesHTML}
+                <div class="detail-row"><div class="detail-label">Data sol·licitud</div><div class="detail-value">${fechaSolicitud}</div></div>
+                ${s.responsableRespuesta ? `
+                    <div class="detail-row"><div class="detail-label">Responsable</div><div class="detail-value">${s.responsableRespuesta}</div></div>
+                    <div class="detail-row"><div class="detail-label">Data resposta</div><div class="detail-value">${fechaRespuesta}</div></div>
+                ` : ''}
+            `;
+            
+            document.getElementById('modalDetalle').classList.add('active');
+        }
+        
+        function cerrarModalDetalle() {
+            document.getElementById('modalDetalle').classList.remove('active');
+        }
+        
+        // Cerrar modales al hacer clic fuera
+        document.getElementById('modalObservaciones').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
+        
+        document.getElementById('modalDetalle').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModalDetalle();
+        });
     </script>
 </body>
 </html>
